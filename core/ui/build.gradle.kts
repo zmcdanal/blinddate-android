@@ -33,4 +33,6 @@ dependencies {
     implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.ui.tooling.preview)
     debugImplementation(libs.androidx.ui.tooling)
+
+    implementation(project(":core:design"))
 }
