@@ -12,11 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ethereal.home.HomeRoute
 import com.ethereal.home.navigation.Home
+import com.ethereal.ui.BlindDateBackground
 import com.ethereal.ui.BlindDateBottomBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,52 +33,57 @@ fun BlindDateApp() {
     val showBottomBar = showHomeBar || showMapBar
     val showTopBack = false //route.startsWith(Questionnaire.route)
 
-    Scaffold(
-        topBar = {
-            if (showTopBack) {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton({ nav.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
-                        }
-                    },
-                    title = {}
-                )
-            }
-        },
-        bottomBar = {
-            if (showBottomBar) {
-                if (showHomeBar) {
-                    // Home screen bottom bar: History – Home – Profile
-                    BlindDateBottomBar(
-                        onHistory = {  },
-                        onHome    = { nav.navigate(Home.route) { popUpTo(0) } },
-                        onProfile = {  }
+    BlindDateBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                if (showTopBack) {
+                    TopAppBar(
+                        navigationIcon = {
+                            IconButton({ nav.popBackStack() }) {
+                                Icon(
+                                    Icons.AutoMirrored.Rounded.ArrowBack,
+                                    contentDescription = "Back"
+                                )
+                            }
+                        },
+                        title = {}
                     )
-                } else if (showMapBar) {
-                    // Map screen bottom bar: Cancel Trip – Home – Open in Maps
-                    //TODO
+                }
+            },
+            bottomBar = {
+                if (showBottomBar) {
+                    if (showHomeBar) {
+                        // Home screen bottom bar: History – Home – Profile
+                        BlindDateBottomBar(
+                            onHistory = { },
+                            onHome = { nav.navigate(Home.route) { popUpTo(0) } },
+                            onProfile = { }
+                        )
+                    } else if (showMapBar) {
+                        // Map screen bottom bar: Cancel Trip – Home – Open in Maps
+                        //TODO
 //                    BlindDateMapBar(
 //                        onCancel = { nav.popBackStack(Home.route, inclusive = false) },
 //                        onHome   = { nav.navigate(Home.route) { popUpTo(0) } },
 //                        onOpenMaps = { /* trigger external maps intent */ }
 //                    )
+                    }
                 }
             }
-        }
-    ) { pad ->
-        NavHost(
-            navController = nav,
-            startDestination = Home.route,
-            modifier = Modifier.padding(pad)
-        ) {
-            composable(Home.route) {
-                HomeRoute(
+        ) { pad ->
+            NavHost(
+                navController = nav,
+                startDestination = Home.route,
+                modifier = Modifier.padding(pad)
+            ) {
+                composable(Home.route) {
+                    HomeRoute(
 //                    onStartQuestionnaire = { nav.navigate(Questionnaire.route) },
 //                    onHistory = { nav.navigate(History.route) },
 //                    onProfile = { nav.navigate(Profile.route) }
-                )
-            }
+                    )
+                }
 //            composable(Questionnaire.route) {
 //                QuestionnaireScreen(
 //                    onFinished = { nav.navigate(Map.route) }
@@ -89,6 +96,7 @@ fun BlindDateApp() {
 //            }
 //            composable(History.route) { HistoryScreen() }
 //            composable(Profile.route) { ProfileScreen() }
+            }
         }
     }
 }
