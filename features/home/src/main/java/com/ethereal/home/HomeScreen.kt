@@ -75,6 +75,7 @@ fun HomeScreenContent() {
                     verticalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth(.9f)
                 ) {
+                    // Static info for now
                     UserInfoStrip(
                         title = "Places Visited: ",
                         value = "0",
