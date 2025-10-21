@@ -65,13 +65,23 @@ import com.ethereal.design.theme.NeonRose
 import com.ethereal.ui.BlindDateBackground
 
 @Composable
-fun LoginRoute(viewModel: LoginViewModel = hiltViewModel()) {
-    LoginScreen()
+fun LoginRoute(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onLoggedIn: () -> Unit,
+    onSignUp: () -> Unit,
+) {
+    LoginScreen(
+       onLoggedIn = onLoggedIn,
+        onSignUp = onSignUp
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun LoginScreen() {
+internal fun LoginScreen(
+    onLoggedIn: () -> Unit,
+    onSignUp: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -101,7 +111,9 @@ internal fun LoginScreen() {
 
         // Login Button
         Button(
-            onClick = { },
+            onClick = {
+                onLoggedIn()
+            },
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = NeonRose,
@@ -150,7 +162,7 @@ internal fun LoginScreen() {
                 modifier = Modifier.alignByBaseline()
             )
             TextButton(
-                onClick = { /* TODO navigate to Sign Up */ },
+                onClick = onSignUp,
                 colors = ButtonDefaults.textButtonColors(contentColor = NeonRose),
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier.alignByBaseline()
@@ -292,7 +304,10 @@ fun PasswordField(
 private fun PreviewLoginScreen() {
     BlindDateTheme {
         BlindDateBackground {
-            LoginRoute()
+            LoginRoute(
+                onLoggedIn = {},
+                onSignUp = {}
+            )
         }
     }
 }

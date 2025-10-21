@@ -11,7 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,11 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.BlindDateTypography
+import com.ethereal.design.theme.FogWhite
+import com.ethereal.design.theme.NeonRose
 
 import com.ethereal.home.components.PlanDateVelvetRing
 
@@ -61,7 +72,7 @@ fun HomeScreenContent() {
          *
          *
          * */
-        val ring = Brush.linearGradient(listOf(Color(0xFFFF4D8D), Color(0xFF4DEEFF)))
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,75 +81,131 @@ fun HomeScreenContent() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Hey Alex & Zac, ready to go?",
+                text = "Hey Alex & Zac, ready to go on a Blind Date?",
                 style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 60.dp)
             )
+
             // User Stats -------------
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, ring, RoundedCornerShape(16.dp))
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .wrapContentHeight()
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth(.9f)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Static info for now
-                    UserInfoStrip(
-                        title = "Places Visited: ",
+                    UserInfoCard(
+                        title = "Places Visited",
                         value = "0",
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier
+                            .weight(1f)
                     )
-                    UserInfoStrip(
-                        title = "Distance Traveled: ",
-                        value = "0m",
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    UserInfoStrip(
-                        title = "Favorite Food: ",
-                        value = "Burgers",
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    UserInfoStrip(
-                        title = "Last Date: ",
-                        value = "Feb. 9, 2025"
+                    UserInfoCard(
+                        title = "Distance Traveled",
+                        value = "0 mi",
+                        modifier = Modifier
+                            .weight(1f)
                     )
                 }
-
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    UserInfoCard(
+                        title = "Favorite Food",
+                        value = "Burgers",
+                        modifier = Modifier
+                            .weight(1f)
+                    )
+                    UserInfoCard(
+                        title = "Last Date",
+                        value = "Feb 9, 2025",
+                        modifier = Modifier
+                            .weight(1f)
+                    )
+                }
             }
+
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            Button(
+                onClick = { /* TODO: action */ },
+                shape = RoundedCornerShape(25.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = NeonRose,
+                    contentColor = FogWhite,
+                    disabledContainerColor = Color.Gray,
+                    disabledContentColor = FogWhite
+                ),
+                enabled = true,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .padding(vertical = 8.dp)
+                    .height(60.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.wrapContentSize()
+                ) {
+                    Text(
+                        text = "Plan Date",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Medium
+                        ),
+                        maxLines = 1,
+                        color = FogWhite,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                        contentDescription = "Next",
+                        tint = FogWhite
+                    )
+                }
+            }
 
-
-            PlanDateVelvetRing(onClick = {})
         }
     }
 }
 
+// Add this composable near your other UI bits
 @Composable
-internal fun UserInfoStrip(
+private fun UserInfoCard(
     title: String,
     value: String,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier) {
-        Text(
-            text = title,
-            style = BlindDateTypography.titleMedium,
-        )
-
-        Text(
-            text = value,
-            style = BlindDateTypography.titleMedium,
-        )
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .border(1.dp, NeonRose, RoundedCornerShape(16.dp))
+            .padding(16.dp)
+            .wrapContentHeight()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.White.copy(alpha = 0.7f)
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White
+            )
+        }
     }
-
 }
+
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0B10)
 @Composable
