@@ -17,7 +17,7 @@ Mystery-date dinner picker for couples who can't decide. You set dislikes, aller
 - ViewModel + StateFlow; repository interfaces; use cases where it helps
 
 ## Key features
-- Onboarding: dislikes + allergies (filters)
+- Onboarding: 3 screens - 1: Intro 2: Account Creation 3: User Info and Permissions
 - Night/date theme UI
 - Home “question flow”: cuisine type, include fast food?, price/person, distance, rating floor
 - Surprise reveal: restaurant name unlocks on arrival (geofence/GPS proximity)
