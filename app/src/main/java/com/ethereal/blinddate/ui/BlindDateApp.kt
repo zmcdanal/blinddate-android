@@ -91,9 +91,9 @@ fun BlindDateApp() {
                     onLoggedIn = { navigateHome() },
                     onSignUp = { nav.navigate(Onboarding.ROUTE) }
                 )
-                onboardingGraph(
-                    onTempContinueToHome = { navigateHome() }
-                )
+                onboardingGraph(nav, onFinished = {
+                    navigateHome()
+                })
                 homeGraph()
 
                 // questionnaireGraph(nav), mapGraph(nav)
