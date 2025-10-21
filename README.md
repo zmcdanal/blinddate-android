@@ -1,4 +1,4 @@
-# BlindDate (Android)
+# BlindDate (Android) - In Progress
 
 Mystery-date dinner picker for couples who can't decide. You set dislikes, allergies, price, distance, rating floor—and BlindDate picks a spot and only reveals it when you arrive. 
 
