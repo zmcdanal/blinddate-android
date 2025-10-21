@@ -62,4 +62,6 @@ dependencies {
     implementation(project(":core:design"))
     implementation(project(":core:ui"))
     implementation(project(":features:home"))
+    implementation(project(":features:login"))
+    implementation(project(":features:onboarding"))
 }

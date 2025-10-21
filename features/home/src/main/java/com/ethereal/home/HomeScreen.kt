@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.BlindDateTypography
 
 import com.ethereal.home.components.PlanDateVelvetRing
@@ -49,6 +50,17 @@ fun HomeScreenContent() {
     Scaffold(
         containerColor = Color.Transparent
     ) { paddingValues ->
+        /**
+         *
+         *
+         *
+         *
+         * This is simply a placeholder. Design will differ
+         *
+         *
+         *
+         *
+         * */
         val ring = Brush.linearGradient(listOf(Color(0xFFFF4D8D), Color(0xFF4DEEFF)))
         Column(
             modifier = Modifier
@@ -131,6 +143,10 @@ internal fun UserInfoStrip(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0B10)
 @Composable
 private fun PreviewHomeScreen() {
-    HomeRoute()
+    BlindDateTheme {
+        BlindDateBackground {
+            HomeRoute()
+        }
+    }
 }
 

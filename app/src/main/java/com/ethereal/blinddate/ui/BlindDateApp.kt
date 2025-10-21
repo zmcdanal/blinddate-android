@@ -21,6 +21,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ethereal.home.HomeRoute
 import com.ethereal.home.navigation.Home
+import com.ethereal.login.LoginRoute
+import com.ethereal.login.navigation.Login
 import com.ethereal.ui.BlindDateBackground
 import com.ethereal.ui.BlindDateBottomBar
 
@@ -33,7 +35,7 @@ fun BlindDateApp() {
 
     val showHomeBar = route.startsWith(Home.route)
     val showMapBar = false //route.startsWith(Map.route)
-    val showBottomBar = showHomeBar || showMapBar
+    val showBottomBar = showHomeBar || showMapBar || !route.startsWith(Login.route)
     val showTopBack = false //route.startsWith(Questionnaire.route)
 
     BlindDateBackground {
@@ -77,15 +79,19 @@ fun BlindDateApp() {
         ) { pad ->
             NavHost(
                 navController = nav,
-                startDestination = Home.route,
+                startDestination = Login.route,
                 modifier = Modifier.padding(pad)
             ) {
                 composable(Home.route) {
-                    HomeRoute(
+                    HomeRoute()
+                    // HomeRoute(
 //                    onStartQuestionnaire = { nav.navigate(Questionnaire.route) },
 //                    onHistory = { nav.navigate(History.route) },
 //                    onProfile = { nav.navigate(Profile.route) }
-                    )
+                    // )
+                }
+                composable(Login.route) {
+                    LoginRoute()
                 }
 //            composable(Questionnaire.route) {
 //                QuestionnaireScreen(

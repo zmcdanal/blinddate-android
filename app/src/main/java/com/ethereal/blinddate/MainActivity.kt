@@ -14,7 +14,7 @@ import com.ethereal.home.navigation.homeGraph
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity(){
+class MainActivity : ComponentActivity() {
 
     companion object {
         const val TAG = "MainActivity"
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            println("hey bobby 1")
+
             BlindDateTheme(darkTheme = true, dynamicColor = false) {
                 BlindDateApp()
             }
