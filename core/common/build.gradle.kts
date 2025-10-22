@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ethereal.data"
+    namespace = "com.ethereal.common"
     compileSdk {
         version = release(36)
     }
@@ -28,8 +28,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlin {
         jvmToolchain(17)
@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -46,5 +45,4 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-    implementation(libs.kotlinx.coroutines.android)
 }

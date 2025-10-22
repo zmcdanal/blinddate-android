@@ -1,4 +1,4 @@
-package com.ethereal.models
+package com.ethereal.model
 
 import org.junit.Test
 

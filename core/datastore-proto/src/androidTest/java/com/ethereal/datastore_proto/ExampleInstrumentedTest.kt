@@ -1,4 +1,4 @@
-package com.ethereal.models
+package com.ethereal.datastore_proto
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.ethereal.models.test", appContext.packageName)
+        assertEquals("com.ethereal.datastore_proto.test", appContext.packageName)
     }
 }

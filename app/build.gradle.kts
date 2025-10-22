@@ -59,6 +59,9 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     implementation(project(":core:model"))
+    implementation(project(":core:common"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:data"))
     implementation(project(":core:design"))
     implementation(project(":core:ui"))
     implementation(project(":features:home"))
