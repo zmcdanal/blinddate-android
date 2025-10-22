@@ -2,11 +2,15 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
     kotlin("kapt")
 }
 
 android {
     namespace = "com.ethereal.datastore"
+    compileSdk {
+        version = release(36)
+    }
 
     defaultConfig {
         minSdk = 24
@@ -25,13 +29,14 @@ android {
 
 dependencies {
     implementation(projects.core.model)
-    implementation(projects.core.datastoreProto)
     implementation(libs.androidx.datastore)
-
+    implementation(projects.core.datastoreProto)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.room.ktx)
     kapt(libs.hilt.compiler)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

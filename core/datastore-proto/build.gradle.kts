@@ -8,22 +8,28 @@ java {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
-
-dependencies {
-    api(libs.protobuf.kotlin.lite)
+kotlin {
+    jvmToolchain(17)
 }
 
+dependencies {
+    // Kotlin FULL runtime (brings in protobuf-java transitively)
+    api(libs.protobuf.kotlin)
+}
 
 protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${libs.versions.protoc.get()}"
-    }
+    protoc { artifact = "com.google.protobuf:protoc:${libs.versions.protoc.get()}" }
+
     generateProtoTasks {
         all().configureEach {
             builtins {
-                register("kotlin") {
-                    option("lite")
-                }
+                // Keep Java (FULL) – do NOT set lite
+                named("java").configure { /* no options */ }
+
+                // Also generate Kotlin wrappers
+                // (register if missing; named("kotlin") may exist already on newer plugin)
+                // Safe approach:
+                register("kotlin")
             }
         }
     }
