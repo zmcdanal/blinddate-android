@@ -3,31 +3,34 @@ agp = "8.13.0"
 hilt = "2.57.2"
 ksp = "2.2.20-2.0.3"
 kotlin = "2.2.20"
-compose-bom = "2025.10.00"
+compose-bom = "2025.10.01"
 compose-compiler = "2.0.21"
 activity-compose = "1.11.0"
-protoc = "3.25.3"
-protobuf-plugin = "0.9.4"
-coroutines = "1.9.0"
+protoc = "4.33.0"
+protobuf-plugin = "0.9.5"
+coroutines = "1.10.2"
 javax-inject = "1"
 nav-compose = "2.9.5"
+firebase-bom = "34.4.0"
+coroutines-play-services = "1.10.2"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.13.0"
-uiToolingPreview = "1.9.3"
-uiTooling = "1.9.3"
-roomKtx = "2.8.2"
+uiToolingPreview = "1.9.4"
+uiTooling = "1.9.4"
+roomKtx = "2.8.3"
 material3 = "1.4.0"
-foundation = "1.9.3"
+foundation = "1.9.4"
 navigationRuntimeKtx = "2.9.5"
 datastoreCore = "1.1.7"
 jetbrainsKotlinJvm = "2.2.20"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -54,11 +57,16 @@ androidx-foundation = { group = "androidx.compose.foundation", name = "foundatio
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 protobuf-kotlin = { group = "com.google.protobuf", name = "protobuf-kotlin", version.ref = "protoc" }
-
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomKtx" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomKtx" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomKtx" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomKtx" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines-play-services" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "50479462203",
+    "project_id": "blinddate-prod",
+    "storage_bucket": "blinddate-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50479462203:android:8ac32c49ad6a471400691e",
+        "android_client_info": {
+          "package_name": "com.ethereal.blinddate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "50479462203-ol0c1osiv4vmbjv5kn8m5jsrlai0beb3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmedjPHlIbEZlXrbww-idgFVXto0oXIHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "50479462203-ol0c1osiv4vmbjv5kn8m5jsrlai0beb3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

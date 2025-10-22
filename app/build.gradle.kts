@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.ksp)
+    kotlin("kapt")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -55,12 +56,16 @@ dependencies {
     implementation(libs.compose.material.icons.extended)
 
     implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:datastore"))
+    implementation(project(":core:network"))
     implementation(project(":core:data"))
     implementation(project(":core:design"))
     implementation(project(":core:ui"))
