@@ -1,9 +1,11 @@
 syntax = "proto3";
 
 package com.ethereal.datastore.proto;
+
 option java_package = "com.ethereal.datastore.proto";
 option java_multiple_files = true;
 
 message UserPreferences {
   string authentication_token = 1;
 }
+

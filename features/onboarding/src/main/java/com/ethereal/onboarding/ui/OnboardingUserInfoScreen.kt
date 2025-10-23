@@ -1,7 +1,9 @@
 package com.ethereal.onboarding.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,10 +18,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
+import com.ethereal.ui.BlindDateBackground
 import reusables.NameField
 import reusables.SegmentedSoloPartnerToggle
 
@@ -34,7 +40,7 @@ fun OnboardingUserInfoScreen(
     defaultRadius: Int,
     onDefaultRadiusChange: (Int) -> Unit,
     locationEnabled: Boolean,
-    onLocationEnabledChange: (Boolean) -> Unit,
+    onLocationEnabledChange: () -> Unit,
     onFinish: () -> Unit
 ) {
     // Mode: Solo | With Partner
@@ -83,7 +89,7 @@ fun OnboardingUserInfoScreen(
     Spacer(Modifier.height(20.dp))
 
     OutlinedButton(
-        onClick = { onLocationEnabledChange(true) },
+        onClick = onLocationEnabledChange,
         shape = RoundedCornerShape(25.dp),
         border = BorderStroke(1.dp, NeonRose),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = if (locationEnabled) FogWhite else NeonRose),
@@ -106,4 +112,32 @@ fun OnboardingUserInfoScreen(
             .fillMaxWidth(0.85f)
             .height(56.dp)
     ) { Text("Finish") }
+}
+
+@Preview
+@Composable
+fun PreviewOnboardingUserInfoScreen() {
+    BlindDateTheme {
+        BlindDateBackground {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OnboardingUserInfoScreen(
+                    isPartner = true,
+                    onPartnerToggleChange = {},
+                    displayName = "Daniel",
+                    onDisplayNameChange = {},
+                    partnerName = "Jessica",
+                    onPartnerNameChange = {},
+                    defaultRadius = 15,
+                    onDefaultRadiusChange = {},
+                    locationEnabled = true,
+                    onLocationEnabledChange = {}
+                ) { }
+            }
+        }
+    }
 }

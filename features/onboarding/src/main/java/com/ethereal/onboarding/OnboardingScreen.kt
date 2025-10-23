@@ -1,20 +1,15 @@
 package com.ethereal.onboarding
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethereal.design.theme.FogWhite
@@ -22,9 +17,6 @@ import com.ethereal.design.theme.NeonRose
 import com.ethereal.onboarding.ui.OnboardingAccountScreen
 import com.ethereal.onboarding.ui.OnboardingIntroScreen
 import com.ethereal.onboarding.ui.OnboardingUserInfoScreen
-import reusables.PasswordField
-import reusables.EmailField
-import reusables.NameField
 
 @Composable
 fun OnboardingRoute(
@@ -36,46 +28,42 @@ fun OnboardingRoute(
     onBack: () -> Unit
 ) {
 
-    val email by viewModel.email.collectAsStateWithLifecycle()
-    val password by viewModel.password.collectAsStateWithLifecycle()
-    val confirmPassword by viewModel.confirmPassword.collectAsStateWithLifecycle()
+    val uistate by viewModel.uiState.collectAsStateWithLifecycle()
 
     OnboardingScreen(
-        viewModel = viewModel,
+        uiState = uistate,
         step = step,
         totalSteps = totalSteps,
         onAdvance = onAdvance,
         onFinish = onFinish,
         onBack = onBack,
-        email = email,
-        password = password,
-        confirm = confirmPassword,
-        onTextFieldChange = viewModel::updateTextField
+        onTextFieldChange = viewModel::updateTextField,
+        onTermsChange = viewModel::updateToggle,
+        onHasPartnerChange = viewModel::updateHasPartnerToggle,
+        onRadiusChange = viewModel::updateRadius,
+        onEnableLocation = viewModel::requestLocationPermission,
+        onOpenTermsOfService = viewModel::openTermsOfService,
+        onOpenPrivacyPolicy = viewModel::openPrivacyPolicy
     )
 
 }
 
 @Composable
 internal fun OnboardingScreen(
-    viewModel: OnboardingViewModel,
-    email: String,
-    password: String,
-    confirm: String,
-    onTextFieldChange: (String, OnboardingViewModel.LoginFieldType) -> Unit,
+    uiState: OnboardingUiState,
+    onTextFieldChange: (TextFieldType, String) -> Unit,
+    onTermsChange: (OnboardingAccountToggle, Boolean) -> Unit,
+    onHasPartnerChange: (Boolean) -> Unit,
+    onRadiusChange: (Int) -> Unit,
+    onEnableLocation: () -> Unit,
+    onOpenTermsOfService: () -> Unit,
+    onOpenPrivacyPolicy: () -> Unit,
     step: Int,
     totalSteps: Int,
     onAdvance: () -> Unit,
     onFinish: () -> Unit,
     onBack: () -> Unit
 ) {
-    // Temporary while I adjust Ui - UiState will eventually take over
-    var isPartner by viewModel.isPartner
-    var displayName by viewModel.displayName
-    var partnerName by viewModel.partnerName
-    var termsAccepted by viewModel.termsAccepted
-    var defaultRadius by viewModel.defaultRadius
-    var locationEnabled by viewModel.locationEnabled
-    var accountCreated by viewModel.accountCreated
 
     Column(
         modifier = Modifier
@@ -104,7 +92,7 @@ internal fun OnboardingScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        BackHandler(enabled = (step == 3 && accountCreated)) {
+        BackHandler(enabled = (step == 3 && uiState.accountCreated)) {
             // do nothing: swallow back press
         }
 
@@ -117,45 +105,50 @@ internal fun OnboardingScreen(
 
             2 -> {
                 OnboardingAccountScreen(
-                    emailValue = email,
+                    emailValue = uiState.emailAddress,
                     onEmailChange = {
                         onTextFieldChange(
-                            it,
-                            OnboardingViewModel.LoginFieldType.EMAIL
+                            TextFieldType.EMAIL,
+                            it
+
                         )
                     },
-                    passwordValue = password,
+                    passwordValue = uiState.password,
                     onPasswordChange = {
                         onTextFieldChange(
-                            it,
-                            OnboardingViewModel.LoginFieldType.PASSWORD
+                            TextFieldType.PASSWORD,
+                            it
                         )
                     },
-                    confirmValue = confirm,
+                    confirmValue = uiState.confirmPassword,
                     onConfirmChange = {
                         onTextFieldChange(
-                            it,
-                            OnboardingViewModel.LoginFieldType.CONFIRM_PASSWORD
+                            TextFieldType.CONFIRM_PASSWORD,
+                            it
                         )
                     },
-                    termsAccepted = termsAccepted,
-                    onTermsChange = { termsAccepted = it },
-                    onAdvance = onAdvance
+                    termsAccepted = uiState.termsAccepted,
+                    onTermsChange = {
+                        onTermsChange(OnboardingAccountToggle.TERMS, it)
+                    },
+                    onAdvance = onAdvance,
+                    onOpenTermsOfService = onOpenTermsOfService,
+                    onOpenPrivacyPolicy = onOpenPrivacyPolicy,
                 )
             }
 
             3 -> {
                 OnboardingUserInfoScreen(
-                    isPartner = isPartner,
-                    onPartnerToggleChange = { isPartner = it },
-                    displayName = displayName,
-                    onDisplayNameChange = { displayName = it },
-                    partnerName = partnerName,
-                    onPartnerNameChange = { partnerName = it },
-                    defaultRadius = defaultRadius,
-                    onDefaultRadiusChange = { defaultRadius = it },
-                    locationEnabled = locationEnabled,
-                    onLocationEnabledChange = { locationEnabled = it },
+                    isPartner = uiState.hasPartner,
+                    onPartnerToggleChange = onHasPartnerChange,
+                    displayName = uiState.userName,
+                    onDisplayNameChange = { onTextFieldChange(TextFieldType.USER, it) },
+                    partnerName = uiState.partnerName ?: "",
+                    onPartnerNameChange = { onTextFieldChange(TextFieldType.PARTNER, it) },
+                    defaultRadius = uiState.defaultRadius,
+                    onDefaultRadiusChange = onRadiusChange,
+                    locationEnabled = uiState.locationEnabled,
+                    onLocationEnabledChange = onEnableLocation,
                     onFinish = onFinish
                 )
             }

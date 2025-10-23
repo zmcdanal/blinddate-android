@@ -1,4 +1,4 @@
-package com.ethereal.data.repository.utils
+package com.ethereal.data.sync
 
 import kotlinx.coroutines.flow.Flow
 

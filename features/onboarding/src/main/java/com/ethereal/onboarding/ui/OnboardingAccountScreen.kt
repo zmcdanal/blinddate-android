@@ -1,25 +1,28 @@
 package com.ethereal.onboarding.ui
 
-import androidx.compose.foundation.layout.Row
+import android.util.Patterns
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
+import com.ethereal.onboarding.ui.components.TermsRow
+import com.ethereal.ui.BlindDateBackground
 import reusables.EmailField
 import reusables.PasswordField
 
@@ -33,6 +36,8 @@ fun OnboardingAccountScreen(
     onConfirmChange: (String) -> Unit,
     termsAccepted: Boolean,
     onTermsChange: (Boolean) -> Unit,
+    onOpenTermsOfService: () -> Unit,
+    onOpenPrivacyPolicy: () -> Unit,
     onAdvance: () -> Unit
 ) {
     // Account setup: Email / Password / Confirm / Terms
@@ -54,7 +59,7 @@ fun OnboardingAccountScreen(
     )
 
     // TODO - Move to viewModel
-    val emailOk = android.util.Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()
+    val emailOk = Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()
     val passwordOk = passwordValue.length >= 6
     val confirmOk = confirmValue == passwordValue
     val canSubmit = emailOk && passwordOk && confirmOk && termsAccepted
@@ -82,18 +87,13 @@ fun OnboardingAccountScreen(
     }
 
     Spacer(Modifier.height(12.dp))
-    Row(
-        modifier = Modifier.fillMaxWidth(0.85f),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(checked = termsAccepted, onCheckedChange = onTermsChange)
-        Spacer(Modifier.width(8.dp))
-        Text(
-            "I agree to the Terms of Service and Privacy Policy",
-            color = FogWhite,
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
+
+    TermsRow(
+        checked = termsAccepted,
+        onCheckedChange = onTermsChange,
+        onOpenTermsOfService = onOpenTermsOfService,
+        onOpenPrivacyPolicy = onOpenPrivacyPolicy
+    )
 
     Spacer(Modifier.height(20.dp))
     Button(
@@ -112,4 +112,33 @@ fun OnboardingAccountScreen(
             .height(56.dp)
     ) { Text("Create account") }
 
+}
+
+@Preview
+@Composable
+fun PreviewOnboardingAccountScreen() {
+    BlindDateTheme {
+        BlindDateBackground {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OnboardingAccountScreen(
+                    emailValue = "test@gmail.com",
+                    onEmailChange = {},
+                    passwordValue = "test1234",
+                    onPasswordChange = {},
+                    confirmValue = "test1234",
+                    onConfirmChange = {},
+                    termsAccepted = true,
+                    onTermsChange = {},
+                    onOpenTermsOfService = {},
+                    onOpenPrivacyPolicy = {},
+                    onAdvance = {},
+                )
+            }
+        }
+    }
 }

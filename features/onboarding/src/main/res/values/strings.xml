@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_intro_description">Choose your boundaries—cuisine deal-breakers, budget, distance, and rating floor—then let BlindDate handle the decision. We pick a single restaurant that fits your rules. The twist? You won’t see the name until you pull up. Navigation is built-in, and if a pick doesn’t feel right, you can skip and reroll. Spontaneous, but smart.</string>
+    <string name="onboarding_intro_title">Mystery dinner, dialed to your taste.</string>
+</resources>

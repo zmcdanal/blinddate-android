@@ -8,9 +8,7 @@ plugins {
 
 android {
     namespace = "com.ethereal.datastore"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk { version = release(36) }
 
     defaultConfig {
         minSdk = 24
@@ -22,15 +20,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlin {
-        jvmToolchain(17)
-    }
+    kotlin { jvmToolchain(17) }
 }
 
 dependencies {
-    implementation(projects.core.model)
+    implementation(project(":core:datastore-proto"))
+
     implementation(libs.androidx.datastore)
-    implementation(projects.core.datastoreProto)
+    implementation(libs.protobuf.kotlin.lite)
+
+
+    implementation(projects.core.model)
     implementation(libs.hilt.android)
     implementation(libs.androidx.room.ktx)
     kapt(libs.hilt.compiler)

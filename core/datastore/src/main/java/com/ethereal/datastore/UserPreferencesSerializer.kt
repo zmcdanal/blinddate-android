@@ -8,14 +8,17 @@ import java.io.InputStream
 import java.io.OutputStream
 
 object UserPreferencesSerializer : Serializer<UserPreferences> {
-    override val defaultValue: UserPreferences = UserPreferences.getDefaultInstance()
+    override val defaultValue: UserPreferences =
+        UserPreferences.getDefaultInstance()
 
     override suspend fun readFrom(input: InputStream): UserPreferences =
         try {
             UserPreferences.parseFrom(input)
-        } catch (exception: InvalidProtocolBufferException) {
-            throw CorruptionException("Cannot read proto.", exception)
+        } catch (e: InvalidProtocolBufferException) {
+            throw CorruptionException("Cannot read UserPreferences proto.", e)
         }
 
-    override suspend fun writeTo(t: UserPreferences, output: OutputStream) = t.writeTo(output)
+    override suspend fun writeTo(t: UserPreferences, output: OutputStream) {
+        t.writeTo(output)
+    }
 }

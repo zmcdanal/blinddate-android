@@ -1,69 +1,156 @@
 package com.ethereal.onboarding
 
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ethereal.data.repository.AuthRepository
-import com.ethereal.data.repository.utils.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
-    syncManager: SyncManager,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    val isSyncing = syncManager.isSyncing
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5.seconds.inWholeMilliseconds),
-            initialValue = false,
-        )
+    private val _uiState = MutableStateFlow(OnboardingUiState())
+    val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
 
-    private var _email = MutableStateFlow("")
-    val email = _email.asStateFlow()
+    private val _events = MutableSharedFlow<OnboardingAccountEvent>()
+    val events: SharedFlow<OnboardingAccountEvent> = _events.asSharedFlow()
 
-    private var _password = MutableStateFlow("")
-    val password = _password.asStateFlow()
+    fun updateTextField(field: TextFieldType, newValue: String) {
+        _uiState.update { current ->
+            when (field) {
+                TextFieldType.EMAIL ->
+                    current.copy(emailAddress = newValue)
 
-    private var _confirmPassword = MutableStateFlow("")
-    val confirmPassword = _confirmPassword.asStateFlow()
+                TextFieldType.PASSWORD ->
+                    current.copy(password = newValue)
 
+                TextFieldType.CONFIRM_PASSWORD ->
+                    current.copy(confirmPassword = newValue)
 
-    fun updateTextField(newValue: String, type: LoginFieldType) {
-        try {
-            when (type) {
-                LoginFieldType.EMAIL -> _email.update { newValue }
-                LoginFieldType.PASSWORD -> _password.update { newValue }
-                LoginFieldType.CONFIRM_PASSWORD -> _confirmPassword.update { newValue }
+                TextFieldType.USER ->
+                    current.copy(userName = newValue)
+
+                TextFieldType.PARTNER ->
+                    current.copy(partnerName = newValue)
             }
-        } catch (exception: Exception) {
-            exception.printStackTrace()
         }
     }
 
-    /**
-     * These are only temporary while I update UI
-     * */
-    val isPartner = mutableStateOf(false)
-    val displayName = mutableStateOf("")
-    val partnerName = mutableStateOf("")
-    val termsAccepted = mutableStateOf(false)
-    val defaultRadius = mutableIntStateOf(10) // miles
-    val locationEnabled = mutableStateOf(false)
-    val accountCreated = mutableStateOf(false)
+    fun updateToggle(toggle: OnboardingAccountToggle, isChecked: Boolean) {
+        _uiState.update { current ->
+            when (toggle) {
+                OnboardingAccountToggle.TERMS ->
+                    current.copy(termsAccepted = isChecked)
 
-    enum class LoginFieldType {
-        EMAIL,
-        PASSWORD,
-        CONFIRM_PASSWORD
+                OnboardingAccountToggle.MARKETING ->
+                    current.copy(marketingOptIn = isChecked)
+            }
+        }
     }
+
+    fun updateHasPartnerToggle(toggle: Boolean) {
+        _uiState.update { current ->
+            current.copy(hasPartner = toggle)
+        }
+    }
+
+    fun updateRadius(radius: Int) {
+        _uiState.update { current ->
+            current.copy(defaultRadius = radius)
+        }
+    }
+
+    fun requestLocationPermission() = viewModelScope.launch {
+        //TODO: Add location permission request
+    }
+
+    fun openTermsOfService() = viewModelScope.launch {
+        _events.emit(OnboardingAccountEvent.OpenTermsOfService)
+    }
+
+    fun openPrivacyPolicy() = viewModelScope.launch {
+        _events.emit(OnboardingAccountEvent.OpenPrivacyPolicy)
+    }
+
+    fun submitCreateAccount() {
+        val state = _uiState.value
+        if (!state.canSubmitForm) return
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+        viewModelScope.launch {
+            runCatching {
+                authRepository.signUp(
+                    email = state.emailAddress,
+                    password = state.password
+                )
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
+                _events.emit(OnboardingAccountEvent.NavigateToNextStep)
+            }.onFailure { throwable ->
+                val message = throwable.message ?: "Account creation failed. Please try again."
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = message)
+                }
+                _events.emit(OnboardingAccountEvent.ShowSnackbar(message))
+            }
+        }
+    }
+}
+
+data class OnboardingUiState(
+    val userName: String = "",
+    val partnerName: String? = null,
+    val hasPartner: Boolean = false,
+    val defaultRadius: Int = 0,
+    val emailAddress: String = "",
+    val password: String = "",
+    val confirmPassword: String = "",
+    val accountCreated: Boolean = false,
+    val termsAccepted: Boolean = false,
+    val marketingOptIn: Boolean = false,
+    val isLoading: Boolean = false,
+    val locationEnabled: Boolean = false,
+    val errorMessage: String? = null
+) {
+    val isEmailValid: Boolean
+        get() = Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()
+    val isPasswordValid: Boolean
+        get() = password.length >= 6
+    val isConfirmPasswordValid: Boolean
+        get() = confirmPassword == password
+    val canSubmitForm: Boolean
+        get() = isEmailValid && isPasswordValid && isConfirmPasswordValid && termsAccepted && !isLoading
+}
+
+sealed interface OnboardingAccountEvent {
+    data object NavigateToNextStep : OnboardingAccountEvent
+    data class ShowSnackbar(val message: String) : OnboardingAccountEvent
+    data object OpenTermsOfService : OnboardingAccountEvent
+    data object OpenPrivacyPolicy : OnboardingAccountEvent
+}
+
+enum class TextFieldType {
+    EMAIL,
+    PASSWORD,
+    CONFIRM_PASSWORD,
+    USER,
+    PARTNER
+}
+
+enum class OnboardingAccountToggle {
+    TERMS,
+    MARKETING
 }

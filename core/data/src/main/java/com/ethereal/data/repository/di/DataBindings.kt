@@ -2,6 +2,8 @@ package com.ethereal.data.repository.di
 
 import com.ethereal.data.repository.AuthRepository
 import com.ethereal.data.repository.OfflineFirstAuthRepository
+import com.ethereal.data.repository.OfflineFirstUserDataRepository
+import com.ethereal.data.repository.UserDataRepository
 import dagger.hilt.components.SingletonComponent
 import dagger.Binds
 import dagger.Module
@@ -11,6 +13,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataBindings {
+
+    @Binds
+    @Singleton
+    abstract fun bindUserDataRepository(impl: OfflineFirstUserDataRepository): UserDataRepository
+
     @Binds
     @Singleton
     abstract fun bindAuthRepository(impl: OfflineFirstAuthRepository): AuthRepository
