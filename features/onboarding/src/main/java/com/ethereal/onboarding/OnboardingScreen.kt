@@ -10,11 +10,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
 import com.ethereal.onboarding.ui.OnboardingAccountScreen
@@ -33,6 +35,11 @@ fun OnboardingRoute(
     onFinish: () -> Unit,
     onBack: () -> Unit
 ) {
+
+    val email by viewModel.email.collectAsStateWithLifecycle()
+    val password by viewModel.password.collectAsStateWithLifecycle()
+    val confirmPassword by viewModel.confirmPassword.collectAsStateWithLifecycle()
+
     OnboardingScreen(
         viewModel = viewModel,
         step = step,
@@ -40,12 +47,21 @@ fun OnboardingRoute(
         onAdvance = onAdvance,
         onFinish = onFinish,
         onBack = onBack,
+        email = email,
+        password = password,
+        confirm = confirmPassword,
+        onTextFieldChange = viewModel::updateTextField
     )
+
 }
 
 @Composable
 internal fun OnboardingScreen(
     viewModel: OnboardingViewModel,
+    email: String,
+    password: String,
+    confirm: String,
+    onTextFieldChange: (String, OnboardingViewModel.LoginFieldType) -> Unit,
     step: Int,
     totalSteps: Int,
     onAdvance: () -> Unit,
@@ -56,9 +72,6 @@ internal fun OnboardingScreen(
     var isPartner by viewModel.isPartner
     var displayName by viewModel.displayName
     var partnerName by viewModel.partnerName
-    var email by viewModel.email
-    var password by viewModel.password
-    var confirm by viewModel.confirm
     var termsAccepted by viewModel.termsAccepted
     var defaultRadius by viewModel.defaultRadius
     var locationEnabled by viewModel.locationEnabled
@@ -105,11 +118,26 @@ internal fun OnboardingScreen(
             2 -> {
                 OnboardingAccountScreen(
                     emailValue = email,
-                    onEmailChange = { email = it },
+                    onEmailChange = {
+                        onTextFieldChange(
+                            it,
+                            OnboardingViewModel.LoginFieldType.EMAIL
+                        )
+                    },
                     passwordValue = password,
-                    onPasswordChange = { password = it },
+                    onPasswordChange = {
+                        onTextFieldChange(
+                            it,
+                            OnboardingViewModel.LoginFieldType.PASSWORD
+                        )
+                    },
                     confirmValue = confirm,
-                    onConfirmChange = { confirm = it },
+                    onConfirmChange = {
+                        onTextFieldChange(
+                            it,
+                            OnboardingViewModel.LoginFieldType.CONFIRM_PASSWORD
+                        )
+                    },
                     termsAccepted = termsAccepted,
                     onTermsChange = { termsAccepted = it },
                     onAdvance = onAdvance
