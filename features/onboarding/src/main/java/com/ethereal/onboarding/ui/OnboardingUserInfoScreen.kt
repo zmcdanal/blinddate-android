@@ -1,6 +1,5 @@
 package com.ethereal.onboarding.ui
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ethereal.design.theme.BlindDateTheme
+import com.ethereal.design.theme.BlindDateTypography
 import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
 import com.ethereal.ui.BlindDateBackground
@@ -39,10 +38,16 @@ fun OnboardingUserInfoScreen(
     onPartnerNameChange: (String) -> Unit,
     defaultRadius: Int,
     onDefaultRadiusChange: (Int) -> Unit,
-    locationEnabled: Boolean,
-    onLocationEnabledChange: () -> Unit,
-    onFinish: () -> Unit
+    onAdvance: () -> Unit
 ) {
+    Text(
+        "How will you be using BlindDate?",
+        color = FogWhite.copy(alpha = .85f),
+        style = BlindDateTypography.titleLarge
+    )
+
+    Spacer(Modifier.height(16.dp))
+    
     // Mode: Solo | With Partner
     SegmentedSoloPartnerToggle(
         isPartner = isPartner,
@@ -86,23 +91,11 @@ fun OnboardingUserInfoScreen(
     )
     Text("${temp.toInt()} miles", color = FogWhite)
 
+
+
     Spacer(Modifier.height(20.dp))
-
-    OutlinedButton(
-        onClick = onLocationEnabledChange,
-        shape = RoundedCornerShape(25.dp),
-        border = BorderStroke(1.dp, NeonRose),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = if (locationEnabled) FogWhite else NeonRose),
-        modifier = Modifier
-            .fillMaxWidth(0.85f)
-            .height(48.dp)
-    ) {
-        Text(if (locationEnabled) "Location enabled ✓" else "Enable location")
-    }
-
-    Spacer(Modifier.height(12.dp))
     Button(
-        onClick = onFinish,
+        onClick = onAdvance,
         shape = RoundedCornerShape(25.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = NeonRose,
@@ -111,7 +104,7 @@ fun OnboardingUserInfoScreen(
         modifier = Modifier
             .fillMaxWidth(0.85f)
             .height(56.dp)
-    ) { Text("Finish") }
+    ) { Text("Continue") }
 }
 
 @Preview
@@ -134,8 +127,6 @@ fun PreviewOnboardingUserInfoScreen() {
                     onPartnerNameChange = {},
                     defaultRadius = 15,
                     onDefaultRadiusChange = {},
-                    locationEnabled = true,
-                    onLocationEnabledChange = {}
                 ) { }
             }
         }

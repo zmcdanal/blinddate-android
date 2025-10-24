@@ -22,8 +22,10 @@ object OnbPartner {
     const val ROUTE = "onboarding/partner"
 }
 
+object OnbLocation {
+    const val ROUTE = "onboarding/location"
+}
 
-// com.ethereal.onboarding.navigation.OnboardingNav.kt
 
 fun NavGraphBuilder.onboardingGraph(
     nav: NavHostController,
@@ -35,7 +37,7 @@ fun NavGraphBuilder.onboardingGraph(
     ) {
         composable(OnbIntro.ROUTE) {
             OnboardingRoute(
-                step = 1, totalSteps = 3,
+                step = 1, totalSteps = 4,
                 onAdvance = { nav.navigate(OnbAccount.ROUTE) },
                 onFinish = {},
                 onBack = {}
@@ -43,7 +45,7 @@ fun NavGraphBuilder.onboardingGraph(
         }
         composable(OnbAccount.ROUTE) {
             OnboardingRoute(
-                step = 2, totalSteps = 3,
+                step = 2, totalSteps = 4,
                 onAdvance = { nav.navigate(OnbPartner.ROUTE) },
                 onBack = { nav.popBackStack() },
                 onFinish = {}
@@ -51,10 +53,18 @@ fun NavGraphBuilder.onboardingGraph(
         }
         composable(OnbPartner.ROUTE) {
             OnboardingRoute(
-                step = 3, totalSteps = 3,
-                onFinish = { onFinished() },
-                onBack = { nav.popBackStack() },
-                onAdvance = {}
+                step = 3, totalSteps = 4,
+                onFinish = { },
+                onBack = { },
+                onAdvance = { nav.navigate(OnbLocation.ROUTE) }
+            )
+        }
+        composable(OnbLocation.ROUTE) {
+            OnboardingRoute(
+                step = 4, totalSteps = 4,
+                onAdvance = onFinished,
+                onFinish = onFinished,
+                onBack = { nav.popBackStack() }
             )
         }
     }

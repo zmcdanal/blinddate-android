@@ -20,9 +20,10 @@ class OfflineFirstAuthRepository @Inject constructor(
 
     override fun currentUidOrNull(): String? = authDataSource.currentUidOrNull()
 
-    override suspend fun signIn(email: String, password: String) = withContext(io) {
+    override suspend fun signIn(email: String, password: String): String = withContext(io) {
         val uid = authDataSource.signInWithEmail(email, password)
         userDataRepository.setAuthenticationToken(uid)
+        uid
     }
 
     override suspend fun signUp(email: String, password: String) = withContext(io) {

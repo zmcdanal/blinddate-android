@@ -17,6 +17,7 @@ import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
 import com.ethereal.onboarding.ui.OnboardingAccountScreen
 import com.ethereal.onboarding.ui.OnboardingIntroScreen
+import com.ethereal.onboarding.ui.OnboardingLocationGateScreen
 import com.ethereal.onboarding.ui.OnboardingUserInfoScreen
 
 @Composable
@@ -29,7 +30,7 @@ fun OnboardingRoute(
     onBack: () -> Unit
 ) {
 
-    val uistate by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -46,7 +47,7 @@ fun OnboardingRoute(
     }
 
     OnboardingScreen(
-        uiState = uistate,
+        uiState = uiState,
         step = step,
         totalSteps = totalSteps,
         onAdvance = onAdvance,
@@ -56,7 +57,7 @@ fun OnboardingRoute(
         onTermsChange = viewModel::updateToggle,
         onHasPartnerChange = viewModel::updateHasPartnerToggle,
         onRadiusChange = viewModel::updateRadius,
-        onEnableLocation = viewModel::requestLocationPermission,
+        onLocationGranted = viewModel::updateLocationGranted,
         onOpenTermsOfService = viewModel::openTermsOfService,
         onOpenPrivacyPolicy = viewModel::openPrivacyPolicy,
         onSignUpWithGoogle = viewModel::submitSignInWithGoogle,
@@ -72,9 +73,9 @@ internal fun OnboardingScreen(
     onTermsChange: (OnboardingAccountToggle, Boolean) -> Unit,
     onHasPartnerChange: (Boolean) -> Unit,
     onRadiusChange: (Int) -> Unit,
-    onEnableLocation: () -> Unit,
     onOpenTermsOfService: () -> Unit,
     onOpenPrivacyPolicy: () -> Unit,
+    onLocationGranted: () -> Unit,
     step: Int,
     totalSteps: Int,
     onSignUpWithGoogle: () -> Unit,
@@ -92,7 +93,7 @@ internal fun OnboardingScreen(
     ) {
         // Top row: back/skip + step indicator
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            if (step < 3) {
+            if (step != 3) {
                 TextButton(onClick = onBack) { Text("Back", color = FogWhite) }
             } else {
                 Spacer(Modifier.width(64.dp))
@@ -164,9 +165,15 @@ internal fun OnboardingScreen(
                     onPartnerNameChange = { onTextFieldChange(TextFieldType.PARTNER, it) },
                     defaultRadius = uiState.defaultRadius,
                     onDefaultRadiusChange = onRadiusChange,
-                    locationEnabled = uiState.locationEnabled,
-                    onLocationEnabledChange = onEnableLocation,
-                    onFinish = onFinish
+                    onAdvance = onAdvance
+                )
+            }
+
+            4 -> {
+                OnboardingLocationGateScreen(
+                    uiState = uiState,
+                    onLocationGranted = onLocationGranted,
+                    onAdvance = {}
                 )
             }
         }

@@ -66,6 +66,12 @@ dependencies {
     debugImplementation(libs.firebase.appcheck.debug)
     implementation(libs.firebase.analytics)
 
+    implementation(libs.playservices.location)
+    implementation(libs.playservices.maps)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.utils.ktx)
+    implementation(libs.maps.ktx)
+
     implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:datastore"))

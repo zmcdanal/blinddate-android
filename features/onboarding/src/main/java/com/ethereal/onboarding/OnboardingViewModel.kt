@@ -73,8 +73,8 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun requestLocationPermission() = viewModelScope.launch {
-        //TODO: Add location permission request
+    fun updateLocationGranted() {
+        _uiState.update { it.copy(locationEnabled = true) }
     }
 
     fun openTermsOfService() = viewModelScope.launch {
@@ -114,7 +114,6 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun submitSignInWithGoogle() {
-        println("hey bobby")
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             runCatching {

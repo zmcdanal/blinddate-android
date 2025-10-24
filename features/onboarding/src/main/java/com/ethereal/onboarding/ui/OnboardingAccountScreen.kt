@@ -48,7 +48,7 @@ fun OnboardingAccountScreen(
     Spacer(Modifier.height(12.dp))
 
     GoogleSignUpButton(
-        loading = uiState.isLoading,                  // or separate googleLoading flag if you want finer control
+        loading = uiState.isLoading,
         onClick = onSignUpWithGoogle
     )
 

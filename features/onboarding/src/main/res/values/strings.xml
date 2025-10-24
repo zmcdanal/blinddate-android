@@ -2,4 +2,20 @@
 <resources>
     <string name="onboarding_intro_description">Choose your boundaries—cuisine deal-breakers, budget, distance, and rating floor—then let BlindDate handle the decision. We pick a single restaurant that fits your rules. The twist? You won’t see the name until you pull up. Navigation is built-in, and if a pick doesn’t feel right, you can skip and reroll. Spontaneous, but smart.</string>
     <string name="onboarding_intro_title">Mystery dinner, dialed to your taste.</string>
+
+
+    <string name="onboarding_location_title">We guide you to a surprise spot nearby</string>
+    <string name="onboarding_location_description">
+    We use your location to find great places close to you and show a stealth route (no spoilers).
+</string>
+    <string name="onboarding_location_rationale">
+    Granting location helps us pick nearby spots and navigate you there. You can change this anytime in Settings.
+</string>
+    <string name="onboarding_location_enable">Enable location</string>
+    <string name="onboarding_location_enabled_chip">Location enabled</string>
+    <string name="onboarding_location_open_settings">Open app settings</string>
+    <string name="onboarding_location_required_note">Location is required for BlindDate to work.</string>
+    <string name="onboarding_location_continue">Continue</string>
+    <string name="onboarding_location_illustration_cd">Mystery Restaurant</string>
+
 </resources>
