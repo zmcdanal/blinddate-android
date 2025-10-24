@@ -7,6 +7,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,20 @@ fun OnboardingRoute(
 
     val uistate by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is OnboardingAccountEvent.NavigateToNextStep -> onAdvance()
+                is OnboardingAccountEvent.ShowSnackbar -> {}
+                is OnboardingAccountEvent.OpenTermsOfService -> { /* TODO: open TOS */
+                }
+
+                is OnboardingAccountEvent.OpenPrivacyPolicy -> { /* TODO: open Privacy */
+                }
+            }
+        }
+    }
+
     OnboardingScreen(
         uiState = uistate,
         step = step,
@@ -43,7 +58,9 @@ fun OnboardingRoute(
         onRadiusChange = viewModel::updateRadius,
         onEnableLocation = viewModel::requestLocationPermission,
         onOpenTermsOfService = viewModel::openTermsOfService,
-        onOpenPrivacyPolicy = viewModel::openPrivacyPolicy
+        onOpenPrivacyPolicy = viewModel::openPrivacyPolicy,
+        onSignUpWithGoogle = viewModel::submitSignInWithGoogle,
+        onCreateAccount = viewModel::submitCreateAccount
     )
 
 }
@@ -60,6 +77,8 @@ internal fun OnboardingScreen(
     onOpenPrivacyPolicy: () -> Unit,
     step: Int,
     totalSteps: Int,
+    onSignUpWithGoogle: () -> Unit,
+    onCreateAccount: () -> Unit,
     onAdvance: () -> Unit,
     onFinish: () -> Unit,
     onBack: () -> Unit
@@ -105,7 +124,7 @@ internal fun OnboardingScreen(
 
             2 -> {
                 OnboardingAccountScreen(
-                    emailValue = uiState.emailAddress,
+                    uiState = uiState,
                     onEmailChange = {
                         onTextFieldChange(
                             TextFieldType.EMAIL,
@@ -113,25 +132,23 @@ internal fun OnboardingScreen(
 
                         )
                     },
-                    passwordValue = uiState.password,
                     onPasswordChange = {
                         onTextFieldChange(
                             TextFieldType.PASSWORD,
                             it
                         )
                     },
-                    confirmValue = uiState.confirmPassword,
                     onConfirmChange = {
                         onTextFieldChange(
                             TextFieldType.CONFIRM_PASSWORD,
                             it
                         )
                     },
-                    termsAccepted = uiState.termsAccepted,
                     onTermsChange = {
                         onTermsChange(OnboardingAccountToggle.TERMS, it)
                     },
-                    onAdvance = onAdvance,
+                    onSignUpWithGoogle = onSignUpWithGoogle,
+                    onCreateAccount = onCreateAccount,
                     onOpenTermsOfService = onOpenTermsOfService,
                     onOpenPrivacyPolicy = onOpenPrivacyPolicy,
                 )

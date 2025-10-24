@@ -1,6 +1,6 @@
 package com.ethereal.network.datasource
 
-import com.google.firebase.auth.AuthResult
+import com.ethereal.model.data.auth.AuthResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthDataSource {
@@ -12,4 +12,6 @@ interface AuthDataSource {
     suspend fun signUpWithEmail(email: String, password: String): String
     suspend fun sendPasswordReset(email: String)
     fun signOut()
+
+    suspend fun signInWithGoogle(idToken: String): AuthResult
 }

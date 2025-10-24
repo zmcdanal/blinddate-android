@@ -43,4 +43,12 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     debugImplementation(libs.androidx.ui.tooling)
     ksp(libs.hilt.compiler)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.googleid)
+    implementation(libs.play.services.auth)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.kotlinx.coroutines.play.services)
 }

@@ -12,12 +12,17 @@ android {
     compileSdk = 36
 
     defaultConfig {
+        applicationId = "com.ethereal.blinddate"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildFeatures {
+        buildConfig = true
+        compose = true
     }
 
     buildTypes {
@@ -35,9 +40,6 @@ android {
     }
     kotlin {
         jvmToolchain(17)
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
@@ -60,6 +62,8 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.appcheck.playintegrity)
+    debugImplementation(libs.firebase.appcheck.debug)
     implementation(libs.firebase.analytics)
 
     implementation(project(":core:model"))

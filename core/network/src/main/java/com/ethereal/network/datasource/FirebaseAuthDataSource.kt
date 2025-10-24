@@ -1,11 +1,13 @@
 package com.ethereal.network.datasource
 
 import android.util.Log
+import com.ethereal.model.data.auth.AuthResult
 import com.ethereal.network.model.AuthError
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -70,4 +72,13 @@ class FirebaseAuthDataSource @Inject constructor(
     }
 
     override fun signOut() = auth.signOut()
+
+    override suspend fun signInWithGoogle(idToken: String): AuthResult {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val result = auth.signInWithCredential(credential).await()
+        val uid = result.user?.uid ?: error("Missing UID")
+        val isNew = result.additionalUserInfo?.isNewUser == true
+        return AuthResult(uid = uid, isNewUser = isNew)
+    }
+
 }

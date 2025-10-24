@@ -2,6 +2,7 @@ package com.ethereal.onboarding.ui
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
+import com.ethereal.onboarding.OnboardingUiState
+import com.ethereal.onboarding.ui.components.GoogleSignUpButton
 import com.ethereal.onboarding.ui.components.TermsRow
 import com.ethereal.ui.BlindDateBackground
 import reusables.EmailField
@@ -28,68 +34,82 @@ import reusables.PasswordField
 
 @Composable
 fun OnboardingAccountScreen(
-    emailValue: String,
+    uiState: OnboardingUiState,
     onEmailChange: (String) -> Unit,
-    passwordValue: String,
     onPasswordChange: (String) -> Unit,
-    confirmValue: String,
     onConfirmChange: (String) -> Unit,
-    termsAccepted: Boolean,
     onTermsChange: (Boolean) -> Unit,
     onOpenTermsOfService: () -> Unit,
     onOpenPrivacyPolicy: () -> Unit,
-    onAdvance: () -> Unit
+    onSignUpWithGoogle: () -> Unit,
+    onCreateAccount: () -> Unit
 ) {
-    // Account setup: Email / Password / Confirm / Terms
+
+    Spacer(Modifier.height(12.dp))
+
+    GoogleSignUpButton(
+        loading = uiState.isLoading,                  // or separate googleLoading flag if you want finer control
+        onClick = onSignUpWithGoogle
+    )
+
+    Spacer(Modifier.height(24.dp))
+
+    // Divider
+    Row(
+        modifier = Modifier.fillMaxWidth(0.85f),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = DividerDefaults.Thickness,
+            color = DividerDefaults.color
+        )
+        Text(
+            " OR ",
+            style = MaterialTheme.typography.labelMedium,
+            color = FogWhite.copy(alpha = 0.7f),
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = DividerDefaults.Thickness,
+            color = DividerDefaults.color
+        )
+    }
+
+    Spacer(Modifier.height(24.dp))
+    // Email
     EmailField(
-        value = emailValue,
+        value = uiState.emailAddress,
         onValueChange = onEmailChange,
+        isError = uiState.emailAddress.isNotEmpty() && !uiState.isEmailValid,
+        errorText = "Enter a valid email.",
         modifier = Modifier.padding(bottom = 12.dp)
     )
+
+    // Password
     PasswordField(
-        value = passwordValue,
+        value = uiState.password,
         onValueChange = onPasswordChange,
+        isError = uiState.password.isNotEmpty() && !uiState.isPasswordValid,
+        errorText = "Password must be at least 6 characters.",
         modifier = Modifier.padding(bottom = 12.dp)
     )
+
+    // Confirm Password
     PasswordField(
         placeholder = "Confirm Password",
-        value = confirmValue,
+        value = uiState.confirmPassword,
         onValueChange = onConfirmChange,
+        isError = uiState.confirmPassword.isNotEmpty() && !uiState.isConfirmPasswordValid,
+        errorText = "Passwords don’t match.",
         modifier = Modifier.padding(bottom = 8.dp)
     )
-
-    // TODO - Move to viewModel
-    val emailOk = Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()
-    val passwordOk = passwordValue.length >= 6
-    val confirmOk = confirmValue == passwordValue
-    val canSubmit = emailOk && passwordOk && confirmOk && termsAccepted
-
-    if (!emailOk && emailValue.isNotEmpty()) {
-        Text(
-            "Enter a valid email.",
-            color = Color.Red.copy(alpha = 0.85f),
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
-    if (!passwordOk && passwordValue.isNotEmpty()) {
-        Text(
-            "Password must be at least 6 characters.",
-            color = Color.Red.copy(alpha = 0.85f),
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
-    if (!confirmOk && confirmValue.isNotEmpty()) {
-        Text(
-            "Passwords don’t match.",
-            color = Color.Red.copy(alpha = 0.85f),
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
 
     Spacer(Modifier.height(12.dp))
 
     TermsRow(
-        checked = termsAccepted,
+        checked = uiState.termsAccepted,
         onCheckedChange = onTermsChange,
         onOpenTermsOfService = onOpenTermsOfService,
         onOpenPrivacyPolicy = onOpenPrivacyPolicy
@@ -97,11 +117,8 @@ fun OnboardingAccountScreen(
 
     Spacer(Modifier.height(20.dp))
     Button(
-        onClick = {
-            // TODO: Firebase sign-up; on success:
-            onAdvance()
-        },
-        enabled = canSubmit,
+        onClick = onCreateAccount,
+        enabled = uiState.canSubmitForm,
         shape = RoundedCornerShape(25.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = NeonRose,
@@ -126,17 +143,20 @@ fun PreviewOnboardingAccountScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 OnboardingAccountScreen(
-                    emailValue = "test@gmail.com",
+                    uiState = OnboardingUiState(
+                        emailAddress = "",
+                        password = "",
+                        confirmPassword = "",
+                        termsAccepted = false
+                    ),
                     onEmailChange = {},
-                    passwordValue = "test1234",
                     onPasswordChange = {},
-                    confirmValue = "test1234",
                     onConfirmChange = {},
-                    termsAccepted = true,
                     onTermsChange = {},
                     onOpenTermsOfService = {},
                     onOpenPrivacyPolicy = {},
-                    onAdvance = {},
+                    onCreateAccount = {},
+                    onSignUpWithGoogle = {},
                 )
             }
         }

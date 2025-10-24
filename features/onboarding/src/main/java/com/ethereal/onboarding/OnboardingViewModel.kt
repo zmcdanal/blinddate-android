@@ -14,16 +14,18 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Named
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    @param:Named("serverClientId") private val serverClientId: String
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnboardingUiState())
     val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
 
-    private val _events = MutableSharedFlow<OnboardingAccountEvent>()
+    private val _events = MutableSharedFlow<OnboardingAccountEvent>(replay = 0)
     val events: SharedFlow<OnboardingAccountEvent> = _events.asSharedFlow()
 
     fun updateTextField(field: TextFieldType, newValue: String) {
@@ -83,6 +85,10 @@ class OnboardingViewModel @Inject constructor(
         _events.emit(OnboardingAccountEvent.OpenPrivacyPolicy)
     }
 
+
+    /**
+     *  Account Creation
+     * */
     fun submitCreateAccount() {
         val state = _uiState.value
         if (!state.canSubmitForm) return
@@ -95,9 +101,7 @@ class OnboardingViewModel @Inject constructor(
                     password = state.password
                 )
             }.onSuccess {
-                _uiState.update {
-                    it.copy(isLoading = false)
-                }
+                _uiState.update { it.copy(isLoading = false) }
                 _events.emit(OnboardingAccountEvent.NavigateToNextStep)
             }.onFailure { throwable ->
                 val message = throwable.message ?: "Account creation failed. Please try again."
@@ -108,6 +112,24 @@ class OnboardingViewModel @Inject constructor(
             }
         }
     }
+
+    fun submitSignInWithGoogle() {
+        println("hey bobby")
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        viewModelScope.launch {
+            runCatching {
+                authRepository.signInWithGoogle(serverClientId)
+            }.onSuccess { result ->
+                _uiState.update { it.copy(isLoading = false) }
+                _events.emit(OnboardingAccountEvent.NavigateToNextStep)
+            }.onFailure { t ->
+                val message = t.message ?: "Google sign-up failed. Try again."
+                _uiState.update { it.copy(isLoading = false, errorMessage = message) }
+                _events.emit(OnboardingAccountEvent.ShowSnackbar(message))
+            }
+        }
+    }
+
 }
 
 data class OnboardingUiState(

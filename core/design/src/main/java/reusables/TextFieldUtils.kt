@@ -2,6 +2,7 @@ package reusables
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -36,6 +37,8 @@ import com.ethereal.design.theme.NeonRose
 fun EmailField(
     value: String,
     onValueChange: (String) -> Unit,
+    isError: Boolean = false,
+    errorText: String? = null,
     modifier: Modifier = Modifier,
 ) {
 
@@ -45,8 +48,18 @@ fun EmailField(
         singleLine = true,
         modifier = modifier
             .fillMaxWidth(0.85f)
-            .height(60.dp),
+            .heightIn(min = 60.dp),
         shape = RoundedCornerShape(25.dp),
+        isError = isError,
+        supportingText = {
+            if (isError && !errorText.isNullOrEmpty()) {
+                Text(
+                    errorText,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        },
         placeholder = {
             Text(
                 text = "Email",
@@ -91,6 +104,8 @@ fun PasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String = "Password",
+    isError: Boolean = false,
+    errorText: String? = null,
     modifier: Modifier = Modifier,
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
@@ -101,8 +116,18 @@ fun PasswordField(
         singleLine = true,
         modifier = modifier
             .fillMaxWidth(0.85f)
-            .height(60.dp),
+            .heightIn(min = 60.dp),
         shape = RoundedCornerShape(25.dp),
+        isError = isError,
+        supportingText = {
+            if (isError && !errorText.isNullOrEmpty()) {
+                Text(
+                    errorText,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        },
         placeholder = {
             Text(
                 text = placeholder,
@@ -167,7 +192,7 @@ fun NameField(
         singleLine = true,
         modifier = modifier
             .fillMaxWidth(0.85f)
-            .height(60.dp),
+            .heightIn(min = 60.dp) ,
         shape = RoundedCornerShape(25.dp),
         placeholder = {
             Text(
