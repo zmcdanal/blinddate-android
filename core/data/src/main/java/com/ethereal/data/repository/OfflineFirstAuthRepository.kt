@@ -13,32 +13,33 @@ import javax.inject.Singleton
 class OfflineFirstAuthRepository @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val userDataRepository: UserDataRepository,
-    @param:Dispatcher(BDDispatchers.IO) private val io: CoroutineDispatcher,
+    @param:Dispatcher(BDDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : AuthRepository {
 
     override val authState = authDataSource.authState
 
     override fun currentUidOrNull(): String? = authDataSource.currentUidOrNull()
 
-    override suspend fun signIn(email: String, password: String): String = withContext(io) {
-        val uid = authDataSource.signInWithEmail(email, password)
-        userDataRepository.setAuthenticationToken(uid)
-        uid
-    }
+    override suspend fun signIn(email: String, password: String): String =
+        withContext(ioDispatcher) {
+            val uid = authDataSource.signInWithEmail(email, password)
+            userDataRepository.setAuthenticationToken(uid)
+            uid
+        }
 
-    override suspend fun signUp(email: String, password: String) = withContext(io) {
+    override suspend fun signUp(email: String, password: String) = withContext(ioDispatcher) {
         val uid = authDataSource.signUpWithEmail(email, password)
         userDataRepository.setAuthenticationToken(uid)
     }
 
 
-    override suspend fun sendPasswordReset(email: String) = withContext(io) {
+    override suspend fun sendPasswordReset(email: String) = withContext(ioDispatcher) {
         authDataSource.sendPasswordReset(email)
     }
 
     override fun signOut() = authDataSource.signOut()
 
-    override suspend fun signInWithGoogle(idToken: String): AuthResult = withContext(io) {
+    override suspend fun signInWithGoogle(idToken: String): AuthResult = withContext(ioDispatcher) {
         val authResult = authDataSource.signInWithGoogle(idToken)
         userDataRepository.setAuthenticationToken(authResult.uid)
         authResult

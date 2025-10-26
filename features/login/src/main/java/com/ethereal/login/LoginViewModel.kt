@@ -26,17 +26,6 @@ class LoginViewModel @Inject constructor(
 
     private val submitMutex = Mutex()
 
-    init {
-        viewModelScope.launch {
-            authRepository.authState
-                .distinctUntilChanged()
-                .collect { uid ->
-                    _uiState.update { it.copy(isLoggedIn = uid != null) }
-                    if (uid != null) _uiState.update { it.copy(password = "") }
-                }
-        }
-    }
-
     fun onEmailChange(email: String) =
         _uiState.update { it.copy(email = email, error = null) }
 
@@ -86,6 +75,12 @@ class LoginViewModel @Inject constructor(
             else -> t.message ?: "Login failed."
         }
     }
+}
+
+sealed interface AuthState {
+    data object Loading : AuthState
+    data class Authenticated(val uid: String) : AuthState
+    data object Unauthenticated : AuthState
 }
 
 data class LoginUiState(

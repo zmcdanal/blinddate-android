@@ -56,9 +56,6 @@ fun LoginRoute(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(uiState.isLoggedIn) {
-        if (uiState.isLoggedIn) onLoggedIn()
-    }
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {

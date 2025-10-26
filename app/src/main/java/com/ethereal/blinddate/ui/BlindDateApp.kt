@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.ethereal.blinddate.navigation.Entry
+import com.ethereal.blinddate.navigation.entryGraph
 import com.ethereal.home.navigation.Home
 import com.ethereal.home.navigation.homeGraph
 import com.ethereal.login.navigation.Login
@@ -35,7 +37,9 @@ fun BlindDateApp() {
 
     val showHomeBar = route.startsWith(Home.ROUTE)
     val showMapBar = false // route.startsWith(Map.route)
+    // TODO restructure bottom bar logic
     val showBottomBar = showHomeBar || showMapBar || !route.startsWith(Login.ROUTE)
+            || !route.startsWith(Onboarding.ROUTE)
     val showTopBack = false // route.startsWith(Questionnaire.route)
 
     fun navigateHome() {
@@ -83,9 +87,14 @@ fun BlindDateApp() {
         ) { pad ->
             NavHost(
                 navController = nav,
-                startDestination = Login.ROUTE,
+                startDestination = Entry.ROUTE,
                 modifier = Modifier.padding(pad)
             ) {
+
+                entryGraph(
+                    onToHome = { navigateHome() },
+                    onToLogin = { nav.navigate(Login.ROUTE) { popUpTo(0) } }
+                )
 
                 loginGraph(
                     onLoggedIn = { navigateHome() },
