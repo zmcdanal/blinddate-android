@@ -36,6 +36,7 @@ foundation = "1.9.4"
 navigationRuntimeKtx = "2.9.5"
 datastoreCore = "1.1.7"
 jetbrainsKotlinJvm = "2.2.20"
+ui = "1.9.4"
 
 
 [libraries]
@@ -88,6 +89,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomKtx" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomKtx" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines-play-services" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 
 
 [plugins]

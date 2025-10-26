@@ -3,7 +3,10 @@ package com.ethereal.blinddate.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -18,6 +21,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.ethereal.blinddate.navigation.Entry
 import com.ethereal.blinddate.navigation.entryGraph
+import com.ethereal.common.navigation.ui.ActionBottomBar
+import com.ethereal.common.navigation.ui.BottomTabsBar
 import com.ethereal.home.navigation.Home
 import com.ethereal.home.navigation.homeGraph
 import com.ethereal.login.navigation.Login
@@ -41,9 +46,10 @@ fun BlindDateApp() {
     val showBottomBar = showHomeBar || showMapBar || !route.startsWith(Login.ROUTE)
             || !route.startsWith(Onboarding.ROUTE)
     val showTopBack = false // route.startsWith(Questionnaire.route)
+    val showCenterAction = true
 
-    fun navigateHome() {
-        nav.navigate(Home.ROUTE) {
+    fun navigateSingleTop(route: String) {
+        nav.navigate(route) {
             popUpTo(nav.graph.findStartDestination().id) {
                 inclusive = false
                 saveState = true
@@ -56,31 +62,30 @@ fun BlindDateApp() {
     BlindDateBackground {
         Scaffold(
             containerColor = Color.Transparent,
-            topBar = {
-                if (showTopBack) {
-                    TopAppBar(
-                        navigationIcon = {
-                            IconButton({ nav.popBackStack() }) {
-                                Icon(
-                                    Icons.AutoMirrored.Rounded.ArrowBack,
-                                    contentDescription = "Back"
-                                )
-                            }
-                        },
-                        title = {}
-                    )
+            topBar = { },
+
+            floatingActionButton = {
+                if (showBottomBar && showCenterAction) {
+                    FloatingActionButton(
+                        onClick = { }
+                    ) {
+                        Icon(Icons.Outlined.Star, contentDescription = "Do the thing")
+                    }
                 }
             },
+            floatingActionButtonPosition = FabPosition.Center,
             bottomBar = {
                 if (showBottomBar) {
-                    if (showHomeBar) {
-                        BlindDateBottomBar(
-                            onHistory = { /* TODO */ },
-                            onHome = { navigateHome() },
-                            onProfile = { /* TODO */ }
+                    if (showCenterAction) {
+                        ActionBottomBar(
+                            currentRoute = route,
+                            onNavigate = ::navigateSingleTop,
                         )
-                    } else if (showMapBar) {
-                        // TODO map bar variant
+                    } else {
+                        BottomTabsBar(
+                            currentRoute = route,
+                            onNavigate = ::navigateSingleTop
+                        )
                     }
                 }
             }
@@ -92,20 +97,19 @@ fun BlindDateApp() {
             ) {
 
                 entryGraph(
-                    onToHome = { navigateHome() },
+                    onToHome = { navigateSingleTop(Home.ROUTE) },
                     onToLogin = { nav.navigate(Login.ROUTE) { popUpTo(0) } }
                 )
 
                 loginGraph(
-                    onLoggedIn = { navigateHome() },
+                    onLoggedIn = { navigateSingleTop(Home.ROUTE) },
                     onSignUp = { nav.navigate(Onboarding.ROUTE) }
                 )
                 onboardingGraph(nav, onFinished = {
-                    navigateHome()
+                    navigateSingleTop(Home.ROUTE)
                 })
                 homeGraph()
 
-                // questionnaireGraph(nav), mapGraph(nav)
             }
         }
     }

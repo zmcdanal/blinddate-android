@@ -10,6 +10,10 @@ import androidx.navigation.compose.composable
 import com.ethereal.blinddate.AuthViewModel
 import com.ethereal.model.data.auth.AuthState
 
+object Entry {
+    const val ROUTE = "entry"
+}
+
 fun NavGraphBuilder.entryGraph(
     onToHome: () -> Unit,
     onToLogin: () -> Unit,
