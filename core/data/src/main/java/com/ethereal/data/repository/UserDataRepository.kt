@@ -7,5 +7,7 @@ interface UserDataRepository {
 
     val userData: Flow<UserData>
 
-    fun setAuthenticationToken(token: String)
+    suspend fun setAuthenticationToken(token: String)
+
+    suspend fun setDefaultRadius(radius: Float)
 }

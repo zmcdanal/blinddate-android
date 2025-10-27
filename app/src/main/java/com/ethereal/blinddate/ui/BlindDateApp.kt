@@ -43,9 +43,13 @@ fun BlindDateApp() {
     val showHomeBar = route.startsWith(Home.ROUTE)
     val showMapBar = false // route.startsWith(Map.route)
     // TODO restructure bottom bar logic
-    val showBottomBar = showHomeBar || showMapBar || !route.startsWith(Login.ROUTE)
-            || !route.startsWith(Onboarding.ROUTE)
-    val showTopBack = false // route.startsWith(Questionnaire.route)
+    val hideBottomBar = route.isEmpty() ||
+            route.startsWith(Login.ROUTE) ||
+            route.startsWith(Onboarding.ROUTE) ||
+            route.startsWith(Entry.ROUTE)
+
+    val showBottomBar = !hideBottomBar && route.startsWith(Home.ROUTE)
+
     val showCenterAction = true
 
     fun navigateSingleTop(route: String) {

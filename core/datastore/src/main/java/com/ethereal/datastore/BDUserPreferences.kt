@@ -23,7 +23,10 @@ class BDUserPreferences @Inject constructor(
 
     // Mapped domain object
     val userData: Flow<UserData> = dataStore.data.map { prefs ->
-        UserData(authenticationToken = prefs.authenticationToken)
+        UserData(
+            authenticationToken = prefs.authenticationToken,
+            defaultRadius = prefs.defaultRadius,
+        )
     }
 
     suspend fun setAuthenticationToken(token: String) {
@@ -38,7 +41,19 @@ class BDUserPreferences @Inject constructor(
         }
     }
 
-    suspend fun clearAuthenticationToken() {
+    suspend fun setDefaultRadius(radius: Float) {
+        try {
+            dataStore.updateData { current ->
+                current.toBuilder()
+                    .setDefaultRadius(radius)
+                    .build()
+            }
+        } catch (e: IOException) {
+            Log.e(TAG, "Failed to update user preferences", e)
+        }
+    }
+
+    suspend fun clearUserData() {
         try {
             dataStore.updateData { current ->
                 current.toBuilder()

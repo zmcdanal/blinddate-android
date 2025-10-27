@@ -22,6 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.BlindDateTypography
 import com.ethereal.design.theme.FogWhite
@@ -45,19 +48,39 @@ import com.ethereal.ui.BlindDateBackground
 import com.ethereal.ui.BlindDateBottomBar
 
 @Composable
-fun HomeRoute(viewModel: HomeViewModel = hiltViewModel()) {
-    // TODO- uistate init
-    HomeScreen()
+fun HomeRoute(
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val homeScreenUiState by viewModel.homeScreenUiState.collectAsStateWithLifecycle()
+
+    HomeScreen(
+        homeScreenUiState = homeScreenUiState
+    )
 }
 
 @Composable
-fun HomeScreen() {
-    //TODO - ViewModel states
-    HomeScreenContent()
+fun HomeScreen(
+    homeScreenUiState: HomeScreenUiState,
+) {
+    when (homeScreenUiState) {
+        is HomeScreenUiState.Error -> {
+            // TODO
+        }
+
+        is HomeScreenUiState.Loading -> {
+            // TODO
+        }
+
+        is HomeScreenUiState.Ready -> {
+            HomeScreenContent(
+                homeScreenUiState = homeScreenUiState
+            )
+        }
+    }
 }
 
 @Composable
-fun HomeScreenContent() {
+fun HomeScreenContent(homeScreenUiState: HomeScreenUiState) {
     Scaffold(
         containerColor = Color.Transparent
     ) { paddingValues ->

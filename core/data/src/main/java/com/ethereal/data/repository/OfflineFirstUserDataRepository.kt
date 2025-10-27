@@ -18,9 +18,15 @@ class OfflineFirstUserDataRepository @Inject constructor(
     override val userData: Flow<UserData>
         get() = bdUserPreferences.userData
 
-    override fun setAuthenticationToken(token: String) {
+    override suspend fun setAuthenticationToken(token: String) {
         CoroutineScope(ioDispatcher).launch {
             bdUserPreferences.setAuthenticationToken(token)
+        }
+    }
+
+    override suspend fun setDefaultRadius(radius: Float) {
+        CoroutineScope(ioDispatcher).launch {
+            bdUserPreferences.setDefaultRadius(radius)
         }
     }
 

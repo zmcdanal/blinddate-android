@@ -35,7 +35,7 @@ import com.ethereal.onboarding.OnboardingUiState
 import com.ethereal.onboarding.R
 import com.ethereal.ui.BlindDateBackground
 
-private val LOCATION_PERMS = arrayOf(
+private val LOCATION_PERMISSIONS = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
     Manifest.permission.ACCESS_COARSE_LOCATION
 )
@@ -52,19 +52,17 @@ fun OnboardingLocationGateScreen(
     val isPreview = LocalInspectionMode.current
 
     fun hasAnyPermission(): Boolean =
-        LOCATION_PERMS.any {
+        LOCATION_PERMISSIONS.any {
             ContextCompat.checkSelfPermission(
                 context,
                 it
             ) == PackageManager.PERMISSION_GRANTED
         }
 
-    // Local signal of a *recent* permission result (used for "blocked" UX)
     var lastSystemResult by remember { mutableStateOf<Map<String, Boolean>?>(null) }
 
     val onLocationGrantedUpdated by rememberUpdatedState(onLocationGranted)
 
-    // Launcher → if granted, notify VM immediately
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -75,14 +73,12 @@ fun OnboardingLocationGateScreen(
         }
     }
 
-    // Sync VM on first composition if already granted (e.g., returning user)
     LaunchedEffect(Unit) {
         if (!isPreview && hasAnyPermission() && !uiState.locationEnabled) {
             onLocationGrantedUpdated()
         }
     }
 
-    // Re-check on resume (covers returning from App Settings)
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME && !isPreview) {
@@ -95,17 +91,14 @@ fun OnboardingLocationGateScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // Only compute rationale if we have a real Activity
     val showRationale = remember(activity, lastSystemResult, uiState.locationEnabled) {
-        activity != null && LOCATION_PERMS.any {
+        activity != null && LOCATION_PERMISSIONS.any {
             ActivityCompat.shouldShowRequestPermissionRationale(activity, it)
         }
     }
 
-    // Consider "blocked" only after we've actually asked once
     val isBlocked = !showRationale && lastSystemResult != null && !uiState.locationEnabled
 
-    // Continue is driven by VM (and preview for design)
     val continueEnabled by remember(uiState.locationEnabled, isPreview) {
         derivedStateOf { uiState.locationEnabled || isPreview }
     }
@@ -169,7 +162,7 @@ fun OnboardingLocationGateScreen(
 
         // Request permissions
         Button(
-            onClick = { if (!isPreview) launcher.launch(LOCATION_PERMS) },
+            onClick = { if (!isPreview) launcher.launch(LOCATION_PERMISSIONS) },
             enabled = !uiState.locationEnabled,
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(
@@ -210,7 +203,7 @@ fun OnboardingLocationGateScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Continue (gated by VM)
+        // Continue
         Button(
             onClick = onAdvance,
             enabled = continueEnabled,

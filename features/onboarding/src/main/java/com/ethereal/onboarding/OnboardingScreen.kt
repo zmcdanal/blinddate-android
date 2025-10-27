@@ -173,7 +173,7 @@ internal fun OnboardingScreen(
                 OnboardingLocationGateScreen(
                     uiState = uiState,
                     onLocationGranted = onLocationGranted,
-                    onAdvance = {}
+                    onAdvance = onAdvance
                 )
             }
         }
