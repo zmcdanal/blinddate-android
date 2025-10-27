@@ -13,6 +13,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -30,7 +32,7 @@ class HomeViewModel @Inject constructor(
         locationClient = locationClient,
     ).stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
+        started = SharingStarted.WhileSubscribed(5_000),
         initialValue = HomeScreenUiState.Loading
     )
 
@@ -42,30 +44,22 @@ class HomeViewModel @Inject constructor(
 
         val userStream = userDataRepository.userData
 
-        // TODO: If lastKnown is also null -> show snackbar with retry or something else
-        // Try current GPS once (with timeout), if null - fall back to lastKnown.
-        val locationStream: Flow<GeoPoint?> =
+        val locationStreamNonNull: Flow<GeoPoint> =
             locationClient.currentOnce(timeoutMs = 2_500L)
                 .flatMapLatest { current ->
-                    if (current != null) flowOf(current)
-                    else locationClient.lastKnownOnce()
+                    if (current != null) flowOf(current) else locationClient.lastKnownOnce()
                 }
-                .onStart { emit(null) }
+                .filterNotNull()
+                .distinctUntilChanged()
 
-        return combine(
-            userStream,
-            locationStream
-        ) { userData, userLocation ->
-            val isMapReady = userLocation != null
+        return combine(userStream, locationStreamNonNull) { userData, userLocation ->
             val mapData = MapData(
                 userLocation = userLocation,
                 center = userLocation,
                 radiusMeters = userData.defaultRadius,
                 isEditingRadius = false,
-                isMapReady = isMapReady
+                isMapReady = true
             )
-
-
             val dateDetails = DateDetails(
                 genre = "",
                 keywords = emptyList(),
@@ -73,12 +67,11 @@ class HomeViewModel @Inject constructor(
                 fastFood = false,
                 mapData = mapData
             )
-
             HomeScreenUiState.Ready(dateDetails)
         }
-            .map { it as HomeScreenUiState }
-            .onStart { emit(HomeScreenUiState.Loading) }
     }
+
+
 }
 
 sealed interface HomeScreenUiState {

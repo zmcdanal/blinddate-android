@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,16 +81,24 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeScreenContent(homeScreenUiState: HomeScreenUiState) {
+fun HomeScreenContent(
+    modifier: Modifier = Modifier,
+    homeScreenUiState: HomeScreenUiState.Ready
+) {
     Scaffold(
         containerColor = Color.Transparent
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(.9f)
                 .padding(paddingValues)
         ) {
-
+            HomeMap(
+                homeScreenUiState = homeScreenUiState,
+                modifier = modifier,
+                interactive = false
+            )
         }
     }
 }
