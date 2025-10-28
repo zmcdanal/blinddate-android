@@ -4,6 +4,7 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ethereal.data.repository.AuthRepository
+import com.ethereal.data.repository.UserDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,6 +20,7 @@ import javax.inject.Named
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    val userDataRepository: UserDataRepository,
     @param:Named("serverClientId") private val serverClientId: String
 ) : ViewModel() {
 
@@ -67,7 +69,10 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun updateRadius(radius: Int) {
+    fun updateRadius(radius: Double) {
+        viewModelScope.launch {
+            userDataRepository.setDefaultRadius(radius)
+        }
         _uiState.update { current ->
             current.copy(defaultRadius = radius)
         }
@@ -135,7 +140,7 @@ data class OnboardingUiState(
     val userName: String = "",
     val partnerName: String? = null,
     val hasPartner: Boolean = false,
-    val defaultRadius: Int = 0,
+    val defaultRadius: Double = 0.0,
     val emailAddress: String = "",
     val password: String = "",
     val confirmPassword: String = "",

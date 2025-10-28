@@ -1,34 +1,49 @@
 package com.ethereal.home
 
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import com.ethereal.design.theme.NeonRose
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
-import com.ethereal.model.data.MapData
-import com.ethereal.home.location.geo.toLatLng
+import com.ethereal.model.utils.milesToMeters
+import com.ethereal.model.utils.toLatLng
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.*
+import com.google.maps.android.SphericalUtil
+import com.google.maps.android.compose.*
 
 @Composable
 fun HomeMap(
     homeScreenUiState: HomeScreenUiState.Ready,
     modifier: Modifier = Modifier,
-    interactive: Boolean = false
+    interactive: Boolean = true
 ) {
     val mapData = homeScreenUiState.dateDetails.mapData
-    val center = mapData.center?.toLatLng()
-    println("hey bobby lat: ${center?.latitude} long: ${center?.longitude}")
+    val center: LatLng? = mapData.center?.toLatLng()
+    val radiusMeters = milesToMeters(mapData.radiusMiles)
+
     val cameraState = rememberCameraPositionState {
-        center?.let { position = CameraPosition.fromLatLngZoom(it, 30f) }
+        position = CameraPosition.fromLatLngZoom(center ?: LatLng(37.42, -122.084), 13f)
     }
 
+    // Convert a comfy 24dp padding to pixels for bounds
+    val paddingPx = with(LocalDensity.current) { 24f }.toInt()
 
-    LaunchedEffect(center) {
-        center?.let { cameraState.animate(CameraUpdateFactory.newLatLngZoom(it, 13f)) }
+    // Whenever center or radius changes, fit the bounds
+    LaunchedEffect(center, radiusMeters) {
+        if (center != null && radiusMeters > 0.0) {
+            // Four cardinal points on the circle (N,E,S,W)
+            val north = SphericalUtil.computeOffset(center, radiusMeters, 0.0)
+            val east = SphericalUtil.computeOffset(center, radiusMeters, 90.0)
+            val south = SphericalUtil.computeOffset(center, radiusMeters, 180.0)
+            val west = SphericalUtil.computeOffset(center, radiusMeters, 270.0)
+
+            val bounds = LatLngBounds.builder()
+                .include(north).include(east).include(south).include(west)
+                .build()
+
+            val update = CameraUpdateFactory.newLatLngBounds(bounds, paddingPx)
+            cameraState.animate(update)
+        }
     }
 
     GoogleMap(
@@ -47,19 +62,18 @@ fun HomeMap(
             tiltGesturesEnabled = interactive
         )
     ) {
-        // Radius circle (centered on mapData.center)
         center?.let {
             Circle(
                 center = it,
-                radius = 2_000.00,
+                radius = radiusMeters,
                 strokeWidth = 5f,
                 strokeColor = NeonRose,
-                fillColor = Color.Transparent
+                fillColor = NeonRose.copy(alpha = 0.2f)
             )
-        }
 
-        mapData.userLocation?.toLatLng()?.let {
-            Marker(state = MarkerState(position = it), title = "You")
+            mapData.userLocation?.toLatLng()?.let { pos ->
+                Marker(state = MarkerState(pos), title = "You")
+            }
         }
     }
 }

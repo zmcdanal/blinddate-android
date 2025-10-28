@@ -72,7 +72,7 @@ internal fun OnboardingScreen(
     onTextFieldChange: (TextFieldType, String) -> Unit,
     onTermsChange: (OnboardingAccountToggle, Boolean) -> Unit,
     onHasPartnerChange: (Boolean) -> Unit,
-    onRadiusChange: (Int) -> Unit,
+    onRadiusChange: (Double) -> Unit,
     onOpenTermsOfService: () -> Unit,
     onOpenPrivacyPolicy: () -> Unit,
     onLocationGranted: () -> Unit,

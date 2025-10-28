@@ -50,7 +50,7 @@ fun BlindDateApp() {
 
     val showBottomBar = !hideBottomBar && route.startsWith(Home.ROUTE)
 
-    val showCenterAction = true
+    val showCenterAction = false
 
     fun navigateSingleTop(route: String) {
         nav.navigate(route) {

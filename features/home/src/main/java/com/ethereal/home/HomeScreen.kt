@@ -16,12 +16,18 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -38,11 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethereal.design.theme.BlindDateTheme
-import com.ethereal.design.theme.BlindDateTypography
-import com.ethereal.design.theme.FogWhite
-import com.ethereal.design.theme.NeonRose
-
-import com.ethereal.home.components.PlanDateVelvetRing
+import com.ethereal.home.components.PlannerSheetContent
 
 
 import com.ethereal.ui.BlindDateBackground
@@ -80,26 +85,48 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
-    modifier: Modifier = Modifier,
     homeScreenUiState: HomeScreenUiState.Ready
 ) {
-    Scaffold(
-        containerColor = Color.Transparent
-    ) { paddingValues ->
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.9f)
-                .padding(paddingValues)
-        ) {
-            HomeMap(
-                homeScreenUiState = homeScreenUiState,
-                modifier = modifier,
-                interactive = false
+    val windowInfo = LocalWindowInfo.current            // <- accurate window size (px)
+    val density = LocalDensity.current
+
+    // Sheet should cover ~60% by default
+    val sheetCoversFraction = 0.60f
+    val containerHeightPx = windowInfo.containerSize.height
+    val sheetPeekHeight = with(density) {
+        (containerHeightPx * (1f - sheetCoversFraction)).toDp()
+    }
+
+    val sheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.PartiallyExpanded,
+        skipHiddenState = true
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(sheetState)
+
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = sheetPeekHeight,
+        sheetDragHandle = { BottomSheetDefaults.DragHandle() },
+        sheetContainerColor = MaterialTheme.colorScheme.surface,
+        sheetContent = {
+            PlannerSheetContent(
+                selectedCuisine = setOf("mexican", "bbq"),
+                onToggleCuisine = {},
+                onStart = {}
             )
-        }
+        },
+        containerColor = Color.Transparent
+    ) { innerPadding ->
+        HomeMap(
+            homeScreenUiState = homeScreenUiState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            interactive = true
+        )
     }
 }
 

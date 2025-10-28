@@ -36,8 +36,8 @@ fun OnboardingUserInfoScreen(
     onDisplayNameChange: (String) -> Unit,
     partnerName: String,
     onPartnerNameChange: (String) -> Unit,
-    defaultRadius: Int,
-    onDefaultRadiusChange: (Int) -> Unit,
+    defaultRadius: Double,
+    onDefaultRadiusChange: (Double) -> Unit,
     onAdvance: () -> Unit
 ) {
     Text(
@@ -84,9 +84,9 @@ fun OnboardingUserInfoScreen(
     var temp by remember(defaultRadius) { mutableFloatStateOf(defaultRadius.toFloat()) }
     Slider(
         value = temp,
-        onValueChange = { onDefaultRadiusChange(it.toInt()) },
-        onValueChangeFinished = { onDefaultRadiusChange(temp.toInt().coerceIn(1, 30)) },
-        valueRange = 1f..30f,
+        onValueChange = { onDefaultRadiusChange(it.toDouble()) },
+        onValueChangeFinished = { onDefaultRadiusChange(temp.toDouble().coerceIn(1.0, 100.0)) },
+        valueRange = 1f..100f,
         modifier = Modifier.fillMaxWidth(0.85f)
     )
     Text("${temp.toInt()} miles", color = FogWhite)
@@ -125,7 +125,7 @@ fun PreviewOnboardingUserInfoScreen() {
                     onDisplayNameChange = {},
                     partnerName = "Jessica",
                     onPartnerNameChange = {},
-                    defaultRadius = 15,
+                    defaultRadius = 15.0,
                     onDefaultRadiusChange = {},
                 ) { }
             }
