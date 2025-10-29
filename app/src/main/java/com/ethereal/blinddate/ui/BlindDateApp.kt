@@ -23,6 +23,7 @@ import com.ethereal.blinddate.navigation.Entry
 import com.ethereal.blinddate.navigation.entryGraph
 import com.ethereal.common.navigation.ui.ActionBottomBar
 import com.ethereal.common.navigation.ui.BottomTabsBar
+import com.ethereal.home.HomeScreen
 import com.ethereal.home.navigation.Home
 import com.ethereal.home.navigation.homeGraph
 import com.ethereal.login.navigation.Login
