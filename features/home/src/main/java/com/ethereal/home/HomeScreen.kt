@@ -48,6 +48,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.home.components.PlannerSheetContent
+import com.ethereal.model.data.DateDetails
 
 
 import com.ethereal.ui.BlindDateBackground
@@ -79,7 +80,7 @@ fun HomeScreen(
 
         is HomeScreenUiState.Ready -> {
             HomeScreenContent(
-                homeScreenUiState = homeScreenUiState
+                dateDetails = homeScreenUiState.dateDetails
             )
         }
     }
@@ -88,7 +89,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
-    homeScreenUiState: HomeScreenUiState.Ready
+    dateDetails: DateDetails
 ) {
     val windowInfo = LocalWindowInfo.current            // <- accurate window size (px)
     val density = LocalDensity.current
@@ -121,7 +122,7 @@ fun HomeScreenContent(
         containerColor = Color.Transparent
     ) { innerPadding ->
         HomeMap(
-            homeScreenUiState = homeScreenUiState,
+            dateDetails = dateDetails,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),

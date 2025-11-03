@@ -2,6 +2,9 @@ package com.ethereal.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ethereal.common.NTuple2
+import com.ethereal.common.Result
+import com.ethereal.common.asResult
 import com.ethereal.data.repository.UserDataRepository
 import com.ethereal.home.location.LocationClient
 import com.ethereal.model.data.DateDetails
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
@@ -50,23 +54,36 @@ class HomeViewModel @Inject constructor(
                 .filterNotNull()
                 .distinctUntilChanged()
 
-        return combine(userStream, locationStreamNonNull) { userData, userLocation ->
-            val mapData = MapData(
-                userLocation = userLocation,
-                center = userLocation,
-                radiusMiles = userData.defaultRadius,
-                isEditingRadius = false,
-                isMapReady = true
-            )
-            val dateDetails = DateDetails(
-                genre = "",
-                keywords = emptyList(),
-                priceLevel = 2,
-                fastFood = false,
-                mapData = mapData
-            )
-            HomeScreenUiState.Ready(dateDetails)
-        }
+        return combine(
+            userStream,
+            locationStreamNonNull,
+            ::NTuple2
+        ).asResult()
+            .map { homeResult ->
+                when (homeResult) {
+                    is Result.Error -> HomeScreenUiState.Error("Something went wrong")
+                    is Result.Loading -> HomeScreenUiState.Loading
+                    is Result.Success -> {
+                        val (userData, userLocation) = homeResult.data
+                        val mapData = MapData(
+                            userLocation = userLocation,
+                            center = userLocation,
+                            radiusMiles = userData.defaultRadius,
+                            isEditingRadius = false,
+                            isMapReady = true
+                        )
+                        val dateDetails = DateDetails(
+                            genre = "",
+                            keywords = emptyList(),
+                            priceLevel = 2,
+                            fastFood = false,
+                            mapData = mapData
+                        )
+                        HomeScreenUiState.Ready(dateDetails)
+                    }
+                }
+
+            }
     }
 
 

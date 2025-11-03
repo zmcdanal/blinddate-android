@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import com.ethereal.design.theme.NeonRose
+import com.ethereal.model.data.DateDetails
 import com.ethereal.model.utils.milesToMeters
 import com.ethereal.model.utils.toLatLng
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -13,11 +14,11 @@ import com.google.maps.android.compose.*
 
 @Composable
 fun HomeMap(
-    homeScreenUiState: HomeScreenUiState.Ready,
+    dateDetails: DateDetails,
     modifier: Modifier = Modifier,
     interactive: Boolean = true
 ) {
-    val mapData = homeScreenUiState.dateDetails.mapData
+    val mapData = dateDetails.mapData
     val center: LatLng? = mapData.center?.toLatLng()
     val radiusMeters = milesToMeters(mapData.radiusMiles)
 

@@ -81,20 +81,7 @@ fun EmailField(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Email
         ),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = FogWhite,
-            unfocusedTextColor = FogWhite,
-            disabledTextColor = FogWhite.copy(alpha = 0.5f),
-            cursorColor = NeonRose,
-            focusedBorderColor = NeonRose,
-            unfocusedBorderColor = NeonRose.copy(alpha = 0.5f),
-            disabledBorderColor = NeonRose.copy(alpha = 0.25f),
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedLeadingIconColor = NeonRose,
-            unfocusedLeadingIconColor = NeonRose.copy(alpha = 0.9f)
-        )
+        colors = neonOutlinedTextFieldColors()
     )
 }
 
@@ -160,20 +147,7 @@ fun PasswordField(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         ),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = FogWhite,
-            unfocusedTextColor = FogWhite,
-            disabledTextColor = FogWhite.copy(alpha = 0.5f),
-            cursorColor = NeonRose,
-            focusedBorderColor = NeonRose,
-            unfocusedBorderColor = NeonRose.copy(alpha = 0.5f),
-            disabledBorderColor = NeonRose.copy(alpha = 0.25f),
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedLeadingIconColor = NeonRose,
-            unfocusedLeadingIconColor = NeonRose.copy(alpha = 0.9f)
-        )
+        colors = neonOutlinedTextFieldColors()
     )
 }
 
@@ -188,11 +162,11 @@ fun NameField(
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange, // keep free-form; validate upstream if needed
+        onValueChange = onValueChange,
         singleLine = true,
         modifier = modifier
             .fillMaxWidth(0.85f)
-            .heightIn(min = 60.dp) ,
+            .heightIn(min = 60.dp),
         shape = RoundedCornerShape(25.dp),
         placeholder = {
             Text(
@@ -218,19 +192,26 @@ fun NameField(
             onDone = { onImeAction?.invoke() },
             onNext = { onImeAction?.invoke() }
         ),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = FogWhite,
-            unfocusedTextColor = FogWhite,
-            disabledTextColor = FogWhite.copy(alpha = 0.5f),
-            cursorColor = NeonRose,
-            focusedBorderColor = NeonRose,
-            unfocusedBorderColor = NeonRose.copy(alpha = 0.5f),
-            disabledBorderColor = NeonRose.copy(alpha = 0.25f),
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedLeadingIconColor = NeonRose,
-            unfocusedLeadingIconColor = NeonRose.copy(alpha = 0.9f)
-        )
+        colors = neonOutlinedTextFieldColors()
     )
 }
+
+@Composable
+fun neonOutlinedTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = NeonRose,
+    unfocusedTextColor = FogWhite,
+    disabledTextColor = FogWhite.copy(alpha = 0.5f),
+    cursorColor = NeonRose,
+    focusedBorderColor = NeonRose,
+    unfocusedBorderColor = NeonRose.copy(alpha = 0.5f),
+    disabledBorderColor = NeonRose.copy(alpha = 0.25f),
+    focusedContainerColor = Color.Transparent,
+    unfocusedContainerColor = Color.Transparent,
+    disabledContainerColor = Color.Transparent,
+    focusedLabelColor = NeonRose,
+    unfocusedLabelColor = NeonRose,
+    focusedLeadingIconColor = NeonRose,
+    unfocusedLeadingIconColor = NeonRose.copy(alpha = 0.9f),
+    focusedTrailingIconColor = NeonRose,
+    unfocusedTrailingIconColor = NeonRose.copy(alpha = 0.9f),
+)
