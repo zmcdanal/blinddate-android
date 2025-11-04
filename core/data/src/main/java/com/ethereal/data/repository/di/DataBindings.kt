@@ -4,6 +4,8 @@ import com.ethereal.data.repository.AuthRepository
 import com.ethereal.data.repository.OfflineFirstAuthRepository
 import com.ethereal.data.repository.OfflineFirstSessionRepository
 import com.ethereal.data.repository.OfflineFirstUserDataRepository
+import com.ethereal.data.repository.CityGeocodingRepository
+import com.ethereal.data.repository.OfflineFirstCityGeocodingRepository
 import com.ethereal.data.repository.SessionRepository
 import com.ethereal.data.repository.UserDataRepository
 import dagger.hilt.components.SingletonComponent
@@ -27,4 +29,8 @@ abstract class DataBindings {
     @Binds
     @Singleton
     abstract fun bindSessionRepository(impl: OfflineFirstSessionRepository): SessionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindsReverseGeocodingRepository(impl: OfflineFirstCityGeocodingRepository): CityGeocodingRepository
 }

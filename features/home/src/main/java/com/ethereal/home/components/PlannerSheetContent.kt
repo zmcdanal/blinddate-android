@@ -1,6 +1,5 @@
 package com.ethereal.home.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,14 +11,16 @@ import com.ethereal.model.data.CuisineOption
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlannerSheetContent(
+    cityState: String,
+    onFindCityState: (String) -> Unit,
     selectedCuisine: Set<String>,
     onToggleCuisine: (String) -> Unit,
+    recenterOnUser: () -> Unit,
     onStart: () -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -60,12 +61,11 @@ fun PlannerSheetContent(
         }
 
         item { LocationSection(
-            zip = "35040",
-            onZipChange = {},
+            cityState = cityState,
+            onFindCityState = onFindCityState,
             miles = 5,
             onMilesChange = {},
-            onUseMyLocation = {}
-
+            recenterOnUser = recenterOnUser,
         ) }
 
         item(key = "cuisine") {
@@ -93,9 +93,12 @@ fun PlannerSheetContent(
 private fun PreviewPlannerSheetContent() {
     BlindDateTheme {
         PlannerSheetContent(
+            cityState = "",
+            onFindCityState = {},
             selectedCuisine = setOf("american", "indian"),
             onToggleCuisine = {},
-            onStart = {}
+            onStart = {},
+            recenterOnUser = {}
         )
     }
 }

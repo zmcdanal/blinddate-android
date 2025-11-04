@@ -19,7 +19,7 @@ fun HomeMap(
     interactive: Boolean = true
 ) {
     val mapData = dateDetails.mapData
-    val center: LatLng? = mapData.center?.toLatLng()
+    val center: LatLng? = mapData.userLocation?.toLatLng()
     val radiusMeters = milesToMeters(mapData.radiusMiles)
 
     val cameraState = rememberCameraPositionState {

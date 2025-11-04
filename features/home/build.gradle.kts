@@ -40,14 +40,14 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.compose.material3)
     debugImplementation(libs.androidx.ui.tooling)
     ksp(libs.hilt.compiler)
     implementation(libs.playservices.location)
     implementation(libs.kotlinx.coroutines.play.services)
 
     // Maps
-    implementation(libs.playservices.maps)
+    implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
     implementation(libs.maps.ktx)
     implementation(libs.maps.utils.ktx)

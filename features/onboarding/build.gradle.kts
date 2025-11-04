@@ -39,7 +39,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.foundation)
+    implementation(libs.compose.foundation)
     implementation(libs.androidx.navigation.runtime.ktx)
     debugImplementation(libs.androidx.ui.tooling)
     ksp(libs.hilt.compiler)

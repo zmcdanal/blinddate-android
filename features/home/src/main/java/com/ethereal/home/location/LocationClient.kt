@@ -5,11 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface LocationClient {
-
-    fun lastKnownOnce(): Flow<GeoPoint?>
-
-    /** Emits one fresh GPS update */
-    fun currentOnce(timeoutMs: Long = 2_500L): Flow<GeoPoint?>
+    suspend fun lastKnownOnce(): GeoPoint?
+    suspend fun currentOnce(timeoutMs: Long = 2_500L): GeoPoint?
 
 //    fun updates(intervalMs: Long = 3_000L): Flow<GeoPoint>
 }
