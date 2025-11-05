@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ethereal.common.NTuple2
+import com.ethereal.common.NTuple3
 import com.ethereal.common.Result
 import com.ethereal.common.asResult
 import com.ethereal.data.repository.CityGeocodingRepository
+import com.ethereal.data.repository.DateDetailsRepository
 import com.ethereal.data.repository.UserDataRepository
 import com.ethereal.home.location.LocationClient
 import com.ethereal.model.data.DateDetails
@@ -21,10 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,8 +31,9 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userDataRepository: UserDataRepository,
-    val cityGeocodingRepository: CityGeocodingRepository,
-    val locationClient: LocationClient,
+    private val cityGeocodingRepository: CityGeocodingRepository,
+    private val dateDetailsRepository: DateDetailsRepository,
+    private val locationClient: LocationClient,
 ) : ViewModel() {
 
     companion object {
@@ -44,14 +44,18 @@ class HomeViewModel @Inject constructor(
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
 
     init {
-        // Build the initial Ready state from user + location streams
         viewModelScope.launch {
             homeScreenUiState(
                 userDataRepository = userDataRepository,
+                dateDetailsRepository = dateDetailsRepository,
                 locationClient = locationClient
             ).collect { state -> _homeScreenUiState.value = state }
         }
         getCityGeoPoint("Birmingham, AL")
+    }
+
+    fun startDate() {
+
     }
 
     fun getCityGeoPoint(cityState: String) = viewModelScope.launch {
@@ -95,12 +99,16 @@ class HomeViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun homeScreenUiState(
         userDataRepository: UserDataRepository,
+        dateDetailsRepository: DateDetailsRepository,
         locationClient: LocationClient,
     ): Flow<HomeScreenUiState> {
 
         val userStream = userDataRepository.userData
-
-        val locationStreamNonNull: Flow<GeoPoint> = kotlinx.coroutines.flow.flow {
+        val currentDateDetails: Flow<DateDetails?> = flow {
+            val details = dateDetailsRepository.getOrNull()
+            emit(details)
+        }
+        val locationStreamNonNull: Flow<GeoPoint> = flow {
             val fresh = locationClient.currentOnce(timeoutMs = 2_500L)
             val loc = fresh ?: locationClient.lastKnownOnce()
             if (loc != null) emit(loc)
@@ -108,26 +116,21 @@ class HomeViewModel @Inject constructor(
 
         return combine(
             userStream,
+            currentDateDetails,
             locationStreamNonNull,
-            ::NTuple2
+            ::NTuple3
         ).asResult()
             .map { homeResult ->
                 when (homeResult) {
                     is Result.Error -> HomeScreenUiState.Error("Something went wrong")
                     is Result.Loading -> HomeScreenUiState.Loading
                     is Result.Success -> {
-                        val (userData, userLocation) = homeResult.data
+                        val (userData, currentDateDetails, userLocation) = homeResult.data
                         val mapData = MapData(
                             userLocation = userLocation,
-                            radiusMiles = userData.defaultRadius,
-                            isEditingRadius = false,
-                            isMapReady = true
+                            radiusMiles = userData.defaultRadius
                         )
-                        val dateDetails = DateDetails(
-                            genre = "",
-                            keywords = emptyList(),
-                            priceLevel = 2,
-                            fastFood = false,
+                        val dateDetails = currentDateDetails ?: DateDetails(
                             mapData = mapData
                         )
                         HomeScreenUiState.Ready(dateDetails)
