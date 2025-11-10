@@ -1,4 +1,4 @@
-package reusables
+package com.ethereal.design.reusables
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement

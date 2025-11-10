@@ -41,7 +41,7 @@ class BDUserPreferences @Inject constructor(
         }
     }
 
-    suspend fun setDefaultRadius(radius: Double) {
+    suspend fun setDefaultRadius(radius: Int) {
         try {
             dataStore.updateData { current ->
                 current.toBuilder()

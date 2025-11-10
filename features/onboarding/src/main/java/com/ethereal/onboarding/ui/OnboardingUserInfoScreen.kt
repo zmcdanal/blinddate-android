@@ -20,13 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ethereal.common.Constants
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.BlindDateTypography
 import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
 import com.ethereal.ui.BlindDateBackground
-import reusables.NameField
-import reusables.SegmentedSoloPartnerToggle
+import com.ethereal.design.reusables.NameField
+import com.ethereal.design.reusables.SegmentedSoloPartnerToggle
 
 @Composable
 fun OnboardingUserInfoScreen(
@@ -36,8 +37,8 @@ fun OnboardingUserInfoScreen(
     onDisplayNameChange: (String) -> Unit,
     partnerName: String,
     onPartnerNameChange: (String) -> Unit,
-    defaultRadius: Double,
-    onDefaultRadiusChange: (Double) -> Unit,
+    defaultRadius: Int,
+    onDefaultRadiusChange: (Int) -> Unit,
     onAdvance: () -> Unit
 ) {
     Text(
@@ -47,7 +48,7 @@ fun OnboardingUserInfoScreen(
     )
 
     Spacer(Modifier.height(16.dp))
-    
+
     // Mode: Solo | With Partner
     SegmentedSoloPartnerToggle(
         isPartner = isPartner,
@@ -84,9 +85,9 @@ fun OnboardingUserInfoScreen(
     var temp by remember(defaultRadius) { mutableFloatStateOf(defaultRadius.toFloat()) }
     Slider(
         value = temp,
-        onValueChange = { onDefaultRadiusChange(it.toDouble()) },
-        onValueChangeFinished = { onDefaultRadiusChange(temp.toDouble().coerceIn(1.0, 100.0)) },
-        valueRange = 1f..100f,
+        onValueChange = { onDefaultRadiusChange(it.toInt()) },
+        onValueChangeFinished = { onDefaultRadiusChange(temp.toInt().coerceIn(Constants.MIN_RADIUS_MILES, Constants.MAX_RADIUS_MILES)) },
+        valueRange = Constants.MIN_RADIUS_MILES.toFloat()..Constants.MAX_RADIUS_MILES.toFloat(),
         modifier = Modifier.fillMaxWidth(0.85f)
     )
     Text("${temp.toInt()} miles", color = FogWhite)
@@ -125,7 +126,7 @@ fun PreviewOnboardingUserInfoScreen() {
                     onDisplayNameChange = {},
                     partnerName = "Jessica",
                     onPartnerNameChange = {},
-                    defaultRadius = 15.0,
+                    defaultRadius = 15,
                     onDefaultRadiusChange = {},
                 ) { }
             }

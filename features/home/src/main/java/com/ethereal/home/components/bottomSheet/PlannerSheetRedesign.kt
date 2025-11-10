@@ -8,6 +8,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -15,11 +19,14 @@ import com.ethereal.design.theme.BlindDateTheme
 import androidx.compose.ui.Alignment
 import com.ethereal.home.components.bottomSheet.slide_navigation.PlannerStep
 import com.ethereal.model.data.CuisineOption
+import com.ethereal.model.data.DateDetails
+import com.ethereal.model.data.MapData
 
 @Composable
 fun PlannerSheetRedesign(
-    cityState: String,
+    dateDetails: DateDetails,
     onFindCityState: (String) -> Unit,
+    onSetRadius: (Int) -> Unit,
     selectedCuisine: Set<String>,
     onToggleCuisine: (String) -> Unit,
     recenterOnUser: () -> Unit,
@@ -46,18 +53,15 @@ fun PlannerSheetRedesign(
         CuisineOption("med", "Mediterranean", "🥙"),
         CuisineOption("vegan", "Vegan", "🥗"),
     )
-    // AnimatedContent gives you slide transitions; a pager works too.
     AnimatedContent(
         targetState = currentStep,
         transitionSpec = {
-            // simple left-to-right slide; tweak as desired
             slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
         },
         label = "PlannerStep"
     ) { step ->
         when (step) {
             PlannerStep.Location -> {
-                // Your existing section pieces (split them apart)
                 Column(
                     Modifier
                         .fillMaxWidth()
@@ -69,7 +73,8 @@ fun PlannerSheetRedesign(
                 ) {
                     Text("Mystery Date Planner", style = MaterialTheme.typography.titleLarge)
                     LocationSheet(
-                        cityState = cityState,
+                        dateDetails = dateDetails,
+                        cityState = dateDetails.mapData.cityState,
                         onFindCityState = onFindCityState,
                         recenterOnUser = recenterOnUser,
                     )
@@ -80,6 +85,7 @@ fun PlannerSheetRedesign(
             }
 
             PlannerStep.Radius -> {
+                var radiusMilesString by remember { mutableIntStateOf(dateDetails.mapData.radiusMiles) }
                 Column(
                     Modifier
                         .fillMaxWidth()
@@ -90,10 +96,9 @@ fun PlannerSheetRedesign(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text("Pick a radius", style = MaterialTheme.typography.titleLarge)
-                    // drop in your radius UI (slider/choices)
                     RadiusSheet(
-                        miles = 15,
-                        onMilesChange = {}
+                        miles = radiusMilesString,
+                        onMilesChange = { radiusMilesString = it }
                     )
                     Row(
                         Modifier.fillMaxWidth(),
@@ -104,7 +109,11 @@ fun PlannerSheetRedesign(
                             modifier = Modifier.weight(1f)
                         ) { Text("Back") }
                         Button(
-                            onClick = onNext,
+                            onClick = {
+                                onSetRadius(radiusMilesString)
+                                onNext()
+                                // TODO: Add More checks here before going Next
+                            },
                             modifier = Modifier.weight(1f)
                         ) { Text("Next: Cuisine") }
                     }
@@ -186,8 +195,9 @@ fun PlannerSheetRedesign(
 private fun PreviewPlannerSheetContent() {
     BlindDateTheme {
         PlannerSheetRedesign(
-            cityState = "",
+            dateDetails = DateDetails(mapData = MapData(userLocation = null, radiusMiles = 5)),
             onFindCityState = {},
+            onSetRadius = {},
             selectedCuisine = setOf("american", "indian"),
             onToggleCuisine = {},
             currentStep = PlannerStep.Radius,

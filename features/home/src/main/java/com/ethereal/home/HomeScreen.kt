@@ -38,6 +38,7 @@ fun HomeRoute(
         homeScreenUiState = homeScreenUiState,
         nav = nav,
         onFindCityState = viewModel::getCityGeoPoint,
+        onSetRadius = viewModel::setRadius,
         recenterOnUser = viewModel::centerRadiusOnUser,
         onNext = { viewModel.dispatch(PlannerIntent.Next) },
         onBack = { viewModel.dispatch(PlannerIntent.Back) },
@@ -52,6 +53,7 @@ fun HomeScreen(
     homeScreenUiState: HomeScreenUiState,
     nav: PlannerNavState,
     onFindCityState: (String) -> Unit,
+    onSetRadius: (Int) -> Unit,
     recenterOnUser: () -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
@@ -64,9 +66,9 @@ fun HomeScreen(
             val details = homeScreenUiState.dateDetails
             HomeScreenContent(
                 dateDetails = details,
-                cityState = details.mapData.cityState,
                 currentStep = nav.step,
                 onFindCityState = onFindCityState,
+                onSetRadius = onSetRadius,
                 recenterOnUser = recenterOnUser,
                 onNext = onNext,
                 onBack = onBack,
@@ -89,9 +91,9 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     dateDetails: DateDetails,
-    cityState: String,
     currentStep: PlannerStep,
     onFindCityState: (String) -> Unit,
+    onSetRadius: (Int) -> Unit,
     recenterOnUser: () -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
@@ -123,8 +125,9 @@ fun HomeScreenContent(
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetContent = {
             PlannerSheetRedesign(
-                cityState = cityState,
+                dateDetails = dateDetails,
                 onFindCityState = onFindCityState,
+                onSetRadius = onSetRadius,
                 selectedCuisine = emptySet(),
                 onToggleCuisine = {},
                 recenterOnUser = recenterOnUser,

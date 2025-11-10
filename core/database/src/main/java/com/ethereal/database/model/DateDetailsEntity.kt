@@ -41,7 +41,7 @@ fun DateDetailsEntity.asExternalModel() = DateDetails(
     fastFood = fastFood,
     mapData = MapData(
         userLocation = null,
-        radiusMiles = 5.0
+        radiusMiles = 5
     )
 )
 

@@ -24,7 +24,7 @@ class OfflineFirstUserDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun setDefaultRadius(radius: Double) {
+    override suspend fun setDefaultRadius(radius: Int) {
         CoroutineScope(ioDispatcher).launch {
             bdUserPreferences.setDefaultRadius(radius)
         }

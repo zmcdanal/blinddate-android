@@ -16,26 +16,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ethereal.blinddate.features.home.R
+import com.ethereal.common.Constants
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.NeonRose
-import reusables.neonOutlinedTextFieldColors
+import com.ethereal.design.reusables.neonOutlinedTextFieldColors
 
 @Composable
 fun RadiusSheet(
     modifier: Modifier = Modifier,
     miles: Int,
-    onMilesChange: (Int) -> Unit,
-    minMiles: Int = 1,
-    maxMiles: Int = 200,
-    presetMiles: List<Int> = listOf(5, 10, 15, 20, 25)
+    onMilesChange: (Int) -> Unit
 ) {
+    val presetMiles = Constants.presetRadiusMiles
 
     Column(
         modifier = modifier
@@ -45,16 +51,16 @@ fun RadiusSheet(
     ) {
 
         Text(
-            text = "Search radius",
+            text = stringResource(R.string.search_radius),
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
         OutlinedTextField(
             value = miles.toString(),
-            onValueChange = { s ->
-                val n = s.filter { it.isDigit() }.toIntOrNull()
-                if (n != null) onMilesChange(n.coerceIn(minMiles, maxMiles))
+            onValueChange = { milesString ->
+                val milesInt = milesString.filter { it.isDigit() }.toIntOrNull()
+                if (milesInt != null) onMilesChange(milesInt.coerceIn(Constants.MIN_RADIUS_MILES, Constants.MAX_RADIUS_MILES))
             },
             singleLine = true,
             label = { Text("Distance") },
@@ -78,7 +84,7 @@ fun RadiusSheet(
                 val selected = miles == preset
                 FilterChip(
                     selected = selected,
-                    onClick = { onMilesChange(preset.coerceIn(minMiles, maxMiles)) },
+                    onClick = { onMilesChange(preset) },
                     label = { Text("$preset mi") },
                     shape = RoundedCornerShape(999.dp),
                     border = FilterChipDefaults.filterChipBorder(

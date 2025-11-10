@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ethereal.common.NTuple2
 import com.ethereal.common.NTuple3
 import com.ethereal.common.Result
 import com.ethereal.common.asResult
@@ -76,11 +75,20 @@ class HomeViewModel @Inject constructor(
         Log.d(TAG, "Unable to start date: ", exception)
     }
 
-    private inline fun updateDetails(xform: (DateDetails) -> DateDetails) {
+    private inline fun updateDetails(dateDetailsCopy: (DateDetails) -> DateDetails) {
         _homeScreenUiState.update { state ->
-            if (state is HomeScreenUiState.Ready) state.copy(dateDetails = xform(state.dateDetails))
+            if (state is HomeScreenUiState.Ready) state.copy(dateDetails = dateDetailsCopy(state.dateDetails))
             else state
         }
+    }
+
+    fun setRadius(radius: Int) = updateDetails {
+        val mapData = it.mapData
+        it.copy(
+            mapData = mapData.copy(
+                radiusMiles = radius
+            )
+        )
     }
 
     fun setPriceLevel(value: Int) = updateDetails {
@@ -151,7 +159,8 @@ class HomeViewModel @Inject constructor(
                             dateDetails = old.copy(
                                 mapData = oldMap.copy(
                                     mapLoading = false,
-                                    userLocation = geo
+                                    userLocation = geo,
+                                    cityState = ""
                                 )
                             )
                         )
@@ -244,7 +253,7 @@ class HomeViewModel @Inject constructor(
                         val mapData = MapData(
                             mapLoading = false,
                             userLocation = userLocation,
-                            radiusMiles = 5.0
+                            radiusMiles = userData.defaultRadius
                         )
                         val dateDetails = currentDateDetails ?: DateDetails(
                             mapData = mapData

@@ -9,5 +9,5 @@ interface UserDataRepository {
 
     suspend fun setAuthenticationToken(token: String)
 
-    suspend fun setDefaultRadius(radius: Double)
+    suspend fun setDefaultRadius(radius: Int)
 }

@@ -1,6 +1,5 @@
 package com.ethereal.onboarding.ui
 
-import android.util.Patterns
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ethereal.design.theme.BlindDateTheme
@@ -29,8 +26,8 @@ import com.ethereal.onboarding.OnboardingUiState
 import com.ethereal.onboarding.ui.components.GoogleSignUpButton
 import com.ethereal.onboarding.ui.components.TermsRow
 import com.ethereal.ui.BlindDateBackground
-import reusables.EmailField
-import reusables.PasswordField
+import com.ethereal.design.reusables.EmailField
+import com.ethereal.design.reusables.PasswordField
 
 @Composable
 fun OnboardingAccountScreen(

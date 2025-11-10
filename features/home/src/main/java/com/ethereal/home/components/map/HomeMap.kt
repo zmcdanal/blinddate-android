@@ -5,6 +5,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.ethereal.design.reusables.NeonSpinner
 import com.ethereal.design.theme.NeonRose
 import com.ethereal.model.data.DateDetails
 import com.ethereal.model.utils.milesToMeters
@@ -88,7 +89,7 @@ fun HomeMap(
                 modifier = Modifier.matchParentSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                NeonSpinner()
             }
         }
     }

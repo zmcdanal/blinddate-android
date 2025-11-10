@@ -1,8 +1,6 @@
 package com.ethereal.home.components.bottomSheet
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,11 +11,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -28,22 +27,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ethereal.design.reusables.TrailingCheckmark
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.NeonRose
-import reusables.neonOutlinedTextFieldColors
+import com.ethereal.design.reusables.neonOutlinedTextFieldColors
+import com.ethereal.model.data.DateDetails
+import com.ethereal.model.data.MapData
 
 @Composable
 fun LocationSheet(
+    dateDetails: DateDetails,
     cityState: String,
     onFindCityState: (String) -> Unit,
     recenterOnUser: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    val isReady = dateDetails.mapData.userLocation != null
+    val showFindCheck = isReady && dateDetails.mapData.cityState.isNotBlank()
+    val showMyLocationCheck = isReady && dateDetails.mapData.cityState.isBlank()
+
     var cityStateHolder by remember { mutableStateOf(cityState) }
     val cityStatePattern = remember { Regex(".+,\\s*[A-Za-z]{2}") } // "City, ST"
     val cityStateIsError =
@@ -71,7 +78,10 @@ fun LocationSheet(
             ),
             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp),
             modifier = Modifier.width(240.dp)
-        ) { Text("Use my location", style = MaterialTheme.typography.labelLarge) }
+        ) {
+            Text("Use my location", style = MaterialTheme.typography.labelLarge)
+            TrailingCheckmark(showMyLocationCheck)
+        }
 
         // Divider "or"
         Row(
@@ -119,7 +129,10 @@ fun LocationSheet(
             ),
             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp),
             modifier = Modifier.width(240.dp)
-        ) { Text("Find", style = MaterialTheme.typography.labelLarge) }
+        ) {
+            Text("Find", style = MaterialTheme.typography.labelLarge)
+            TrailingCheckmark(showFindCheck)
+        }
 
         Spacer(Modifier.height(16.dp))
 
@@ -132,6 +145,7 @@ fun LocationSheet(
 private fun PreviewLocationSheet() {
     BlindDateTheme {
         LocationSheet(
+            dateDetails = DateDetails(mapData = MapData(userLocation = null, radiusMiles = 5)),
             cityState = "Birmingham, AL",
             onFindCityState = {},
             recenterOnUser = {}

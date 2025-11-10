@@ -69,7 +69,7 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun updateRadius(radius: Double) {
+    fun updateRadius(radius: Int) {
         viewModelScope.launch {
             userDataRepository.setDefaultRadius(radius)
         }
@@ -140,7 +140,7 @@ data class OnboardingUiState(
     val userName: String = "",
     val partnerName: String? = null,
     val hasPartner: Boolean = false,
-    val defaultRadius: Double = 0.0,
+    val defaultRadius: Int = 0,
     val emailAddress: String = "",
     val password: String = "",
     val confirmPassword: String = "",
