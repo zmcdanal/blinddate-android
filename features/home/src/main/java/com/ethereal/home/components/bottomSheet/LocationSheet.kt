@@ -1,4 +1,4 @@
-package com.ethereal.home.components
+package com.ethereal.home.components.bottomSheet
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,21 +34,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ethereal.design.theme.BlindDateTheme
-import com.ethereal.design.theme.FogWhite
 import com.ethereal.design.theme.NeonRose
 import reusables.neonOutlinedTextFieldColors
 
 @Composable
-fun LocationSection(
+fun LocationSheet(
     cityState: String,
     onFindCityState: (String) -> Unit,
-    miles: Int,
-    onMilesChange: (Int) -> Unit,
     recenterOnUser: () -> Unit,
     modifier: Modifier = Modifier,
-    minMiles: Int = 1,
-    maxMiles: Int = 200,
-    presetMiles: List<Int> = listOf(5, 10, 15, 20, 25)
 ) {
     var cityStateHolder by remember { mutableStateOf(cityState) }
     val cityStatePattern = remember { Regex(".+,\\s*[A-Za-z]{2}") } // "City, ST"
@@ -129,75 +123,18 @@ fun LocationSection(
 
         Spacer(Modifier.height(16.dp))
 
-        Text(
-            text = "Search radius",
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = miles.toString(),
-            onValueChange = { s ->
-                val n = s.filter { it.isDigit() }.toIntOrNull()
-                if (n != null) onMilesChange(n.coerceIn(minMiles, maxMiles))
-            },
-            singleLine = true,
-            label = { Text("Distance") },
-            suffix = { Text("mi") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            colors = neonOutlinedTextFieldColors(),
-            modifier = Modifier.width(140.dp)
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            presetMiles.forEach { preset ->
-                val selected = miles == preset
-                FilterChip(
-                    selected = selected,
-                    onClick = { onMilesChange(preset.coerceIn(minMiles, maxMiles)) },
-                    label = { Text("$preset mi") },
-                    shape = RoundedCornerShape(999.dp),
-                    border = FilterChipDefaults.filterChipBorder(
-                        enabled = true,
-                        selected = selected,
-                        borderColor = NeonRose.copy(alpha = 0.6f),
-                        selectedBorderColor = NeonRose,
-                        disabledBorderColor = NeonRose.copy(alpha = 0.25f),
-                        disabledSelectedBorderColor = NeonRose.copy(alpha = 0.25f)
-                    ),
-                    colors = FilterChipDefaults.filterChipColors(
-                        containerColor = Color.Transparent,
-                        selectedContainerColor = NeonRose.copy(alpha = 0.18f),
-                        labelColor = MaterialTheme.colorScheme.onSurface,
-                        selectedLabelColor = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-            }
-        }
     }
 }
 
 
 @Preview(showBackground = true)
 @Composable
-private fun PreviewPlannerSheetContent() {
+private fun PreviewLocationSheet() {
     BlindDateTheme {
-        PlannerSheetContent(
-            selectedCuisine = setOf("american", "indian"),
-            onToggleCuisine = {},
-            onStart = {},
-            recenterOnUser = {},
+        LocationSheet(
             cityState = "Birmingham, AL",
-            onFindCityState = {}
+            onFindCityState = {},
+            recenterOnUser = {}
         )
     }
 }

@@ -7,7 +7,7 @@ import com.ethereal.data.repository.OfflineFirstUserDataRepository
 import com.ethereal.data.repository.CityGeocodingRepository
 import com.ethereal.data.repository.DateDetailsRepository
 import com.ethereal.data.repository.OfflineFirstCityGeocodingRepository
-import com.ethereal.data.repository.OfflineFistDateDetailsRepository
+import com.ethereal.data.repository.OfflineFirstDateDetailsRepository
 import com.ethereal.data.repository.SessionRepository
 import com.ethereal.data.repository.UserDataRepository
 import dagger.hilt.components.SingletonComponent
@@ -34,7 +34,7 @@ abstract class DataBindings {
 
     @Binds
     @Singleton
-    abstract fun bindDateDetailsRepository(impl: OfflineFistDateDetailsRepository): DateDetailsRepository
+    abstract fun bindDateDetailsRepository(impl: OfflineFirstDateDetailsRepository): DateDetailsRepository
 
     @Binds
     @Singleton

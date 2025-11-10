@@ -49,7 +49,8 @@ fun BlindDateApp() {
             route.startsWith(Onboarding.ROUTE) ||
             route.startsWith(Entry.ROUTE)
 
-    val showBottomBar = !hideBottomBar && route.startsWith(Home.ROUTE)
+    val showBottomBar = false
+    //!hideBottomBar && route.startsWith(Home.ROUTE)
 
     val showCenterAction = false
 

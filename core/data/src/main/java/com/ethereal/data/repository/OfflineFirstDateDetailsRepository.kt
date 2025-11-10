@@ -14,7 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class OfflineFistDateDetailsRepository @Inject constructor(
+class OfflineFirstDateDetailsRepository @Inject constructor(
     private val dao: DateDetailsDao,
     @param:Dispatcher(BDDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : DateDetailsRepository {

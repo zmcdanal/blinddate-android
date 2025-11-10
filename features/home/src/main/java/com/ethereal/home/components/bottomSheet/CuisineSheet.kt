@@ -1,7 +1,6 @@
-package com.ethereal.home.components
+package com.ethereal.home.components.bottomSheet
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.FlowRow
@@ -10,15 +9,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.NeonRose
 import com.ethereal.model.data.CuisineOption
 
 @Composable
-fun CuisineSection(
+fun CuisineSheet(
     title: String = "Cuisine / Region",
     options: List<CuisineOption>,
     selectedIds: Set<String>,
@@ -97,6 +97,31 @@ private fun CuisineCard(
             style = MaterialTheme.typography.labelMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewCuisineSheet() {
+
+    val tempTestOptions = listOf(
+        CuisineOption("american", "American", "🍔"),
+        CuisineOption("mexican", "Mexican", "🌮"),
+        CuisineOption("korean", "Korean", "🍜"),
+        CuisineOption("italian", "Italian", "🍝"),
+        CuisineOption("japanese", "Japanese", "🍣"),
+        CuisineOption("thai", "Thai", "🥟"),
+        CuisineOption("indian", "Indian", "🍛"),
+        CuisineOption("bbq", "BBQ", "🥩"),
+        CuisineOption("med", "Mediterranean", "🥙"),
+        CuisineOption("vegan", "Vegan", "🥗"),
+    )
+    BlindDateTheme {
+        CuisineSheet(
+            options = tempTestOptions,
+            selectedIds = setOf(""),
+            onToggle = {}
         )
     }
 }

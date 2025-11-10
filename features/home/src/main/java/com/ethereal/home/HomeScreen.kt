@@ -19,7 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethereal.design.theme.BlindDateTheme
-import com.ethereal.home.components.PlannerSheetContent
+import com.ethereal.home.components.map.HomeMap
+import com.ethereal.home.components.bottomSheet.PlannerSheetRedesign
+import com.ethereal.home.components.bottomSheet.slide_navigation.PlannerStep
 import com.ethereal.model.data.DateDetails
 
 
@@ -30,53 +32,78 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val homeScreenUiState by viewModel.homeScreenUiState.collectAsStateWithLifecycle()
+    val nav = viewModel.plannerNav
 
     HomeScreen(
         homeScreenUiState = homeScreenUiState,
+        nav = nav,
+        onFindCityState = viewModel::getCityGeoPoint,
         recenterOnUser = viewModel::centerRadiusOnUser,
-        onFindCityState = viewModel::getCityGeoPoint
+        onNext = { viewModel.dispatch(PlannerIntent.Next) },
+        onBack = { viewModel.dispatch(PlannerIntent.Back) },
+        setPriceLevel = viewModel::setPriceLevel,
+        setGuests = viewModel::setGuests,
+        setMinRating = viewModel::setMinRating
     )
 }
 
 @Composable
 fun HomeScreen(
     homeScreenUiState: HomeScreenUiState,
+    nav: PlannerNavState,
     onFindCityState: (String) -> Unit,
-    recenterOnUser: () -> Unit
+    recenterOnUser: () -> Unit,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+    setPriceLevel: (Int) -> Unit,
+    setGuests: (Int) -> Unit,
+    setMinRating: (Int) -> Unit
 ) {
     when (homeScreenUiState) {
-        is HomeScreenUiState.Error -> {
-            // TODO
-        }
-
-        is HomeScreenUiState.Loading -> {
-            // TODO
-        }
-
         is HomeScreenUiState.Ready -> {
+            val details = homeScreenUiState.dateDetails
             HomeScreenContent(
-                dateDetails = homeScreenUiState.dateDetails,
-                cityState = homeScreenUiState.dateDetails.mapData.cityState,
+                dateDetails = details,
+                cityState = details.mapData.cityState,
+                currentStep = nav.step,
                 onFindCityState = onFindCityState,
-                recenterOnUser = recenterOnUser
+                recenterOnUser = recenterOnUser,
+                onNext = onNext,
+                onBack = onBack,
+                setPriceLevel = setPriceLevel,
+                setGuests = setGuests,
+                setMinRating = setMinRating
             )
+        }
+
+        is HomeScreenUiState.Loading -> { /* TODO */
+        }
+
+        is HomeScreenUiState.Error -> { /* TODO */
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(
     dateDetails: DateDetails,
     cityState: String,
+    currentStep: PlannerStep,
     onFindCityState: (String) -> Unit,
-    recenterOnUser: () -> Unit
+    recenterOnUser: () -> Unit,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+    setPriceLevel: (Int) -> Unit,
+    setGuests: (Int) -> Unit,
+    setMinRating: (Int) -> Unit
 ) {
-    val windowInfo = LocalWindowInfo.current            // <- accurate window size (px)
+    val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
 
     // Sheet should cover ~60% by default
-    val sheetCoversFraction = 0.60f
+    val sheetCoversFraction = 0.50f
     val containerHeightPx = windowInfo.containerSize.height
     val sheetPeekHeight = with(density) {
         (containerHeightPx * (1f - sheetCoversFraction)).toDp()
@@ -91,16 +118,25 @@ fun HomeScreenContent(
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = sheetPeekHeight,
-        sheetDragHandle = { BottomSheetDefaults.DragHandle() },
+        sheetSwipeEnabled = false,
+        sheetDragHandle = null,
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetContent = {
-            PlannerSheetContent(
+            PlannerSheetRedesign(
                 cityState = cityState,
                 onFindCityState = onFindCityState,
-                selectedCuisine = setOf("mexican", "bbq"),
+                selectedCuisine = emptySet(),
                 onToggleCuisine = {},
-                onStart = {},
-                recenterOnUser = recenterOnUser
+                recenterOnUser = recenterOnUser,
+                currentStep = currentStep,
+                onNext = onNext,
+                onBack = onBack,
+                priceLevel = dateDetails.priceLevel,
+                onPriceLevelChange = setPriceLevel,
+                guests = dateDetails.guests,
+                onGuestsChange = setGuests,
+                minRating = dateDetails.minRating,
+                onMinRatingChange = setMinRating
             )
         },
         containerColor = Color.Transparent
@@ -114,7 +150,6 @@ fun HomeScreenContent(
         )
     }
 }
-
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0B10)
 @Composable
