@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ethereal.common.Constants
 import com.ethereal.common.NTuple3
 import com.ethereal.common.Result
 import com.ethereal.common.asResult
@@ -24,18 +25,25 @@ import com.ethereal.model.data.MapData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userDataRepository: UserDataRepository,
@@ -51,6 +59,12 @@ class HomeViewModel @Inject constructor(
     private val _homeScreenUiState = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState.Loading)
     val homeScreenUiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
 
+    private val radiusInput = MutableSharedFlow<Int>(
+        replay = 0,
+        extraBufferCapacity = 32,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
     var plannerNav by mutableStateOf(PlannerNavState())
         private set
 
@@ -63,6 +77,26 @@ class HomeViewModel @Inject constructor(
                 locationClient = locationClient
             ).collect { state -> _homeScreenUiState.value = state }
         }
+
+        radiusInput
+            .debounce(Constants.RADIUS_DEBOUNCE_MS)
+            .map { it.coerceIn(Constants.MIN_RADIUS_MILES, Constants.MAX_RADIUS_MILES) }
+            .distinctUntilChanged()
+            .onEach { clamped ->
+                val current = (homeScreenUiState.value as? HomeScreenUiState.Ready)
+                    ?.dateDetails?.mapData?.radiusMiles
+                if (current != clamped) {
+                    updateDetails { dateDetails ->
+                        dateDetails.copy(
+                            mapData = dateDetails.mapData.copy(
+                                radiusMiles = clamped
+                            )
+                        )
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+
     }
 
     fun startDate(dateDetails: DateDetails) = try {
@@ -82,13 +116,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun setRadius(radius: Int) = updateDetails {
-        val mapData = it.mapData
-        it.copy(
-            mapData = mapData.copy(
-                radiusMiles = radius
-            )
-        )
+    fun setRadius(value: Int) {
+        radiusInput.tryEmit(value)
     }
 
     fun setPriceLevel(value: Int) = updateDetails {

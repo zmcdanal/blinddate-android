@@ -98,7 +98,10 @@ fun PlannerSheetRedesign(
                     Text("Pick a radius", style = MaterialTheme.typography.titleLarge)
                     RadiusSheet(
                         miles = radiusMilesString,
-                        onMilesChange = { radiusMilesString = it }
+                        onMilesChange = {
+                            radiusMilesString = it
+                            onSetRadius(it)
+                        }
                     )
                     Row(
                         Modifier.fillMaxWidth(),
@@ -109,11 +112,7 @@ fun PlannerSheetRedesign(
                             modifier = Modifier.weight(1f)
                         ) { Text("Back") }
                         Button(
-                            onClick = {
-                                onSetRadius(radiusMilesString)
-                                onNext()
-                                // TODO: Add More checks here before going Next
-                            },
+                            onClick = onNext,
                             modifier = Modifier.weight(1f)
                         ) { Text("Next: Cuisine") }
                     }

@@ -1,5 +1,6 @@
 package com.ethereal.home.components.bottomSheet
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -57,10 +58,24 @@ fun RadiusSheet(
         )
 
         OutlinedTextField(
-            value = miles.toString(),
+            value = if (miles == 0) "" else miles.toString(),
             onValueChange = { milesString ->
-                val milesInt = milesString.filter { it.isDigit() }.toIntOrNull()
-                if (milesInt != null) onMilesChange(milesInt.coerceIn(Constants.MIN_RADIUS_MILES, Constants.MAX_RADIUS_MILES))
+                if (milesString.isEmpty()) {
+                    onMilesChange(0)
+                } else {
+                    try {
+                        val milesInt = milesString.toInt()
+                        onMilesChange(
+                            milesInt.coerceIn(
+                                Constants.MIN_RADIUS_MILES,
+                                Constants.MAX_RADIUS_MILES
+                            )
+                        )
+                    } catch (exception: Exception) {
+                        Log.d("RadiusSheet", "milesString to milesInt error: ", exception)
+                        onMilesChange(0)
+                    }
+                }
             },
             singleLine = true,
             label = { Text("Distance") },
