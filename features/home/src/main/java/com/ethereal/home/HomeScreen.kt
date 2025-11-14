@@ -2,7 +2,6 @@ package com.ethereal.home
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -16,11 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.home.components.map.HomeMap
-import com.ethereal.home.components.bottomSheet.PlannerSheetRedesign
+import com.ethereal.home.components.bottomSheet.PlannerSheet
 import com.ethereal.home.components.bottomSheet.slide_navigation.PlannerStep
 import com.ethereal.model.data.DateDetails
 
@@ -104,11 +104,10 @@ fun HomeScreenContent(
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
 
-    // Sheet should cover ~60% by default
-    val sheetCoversFraction = 0.50f
+    val sheetHeightFraction = 0.5f
     val containerHeightPx = windowInfo.containerSize.height
     val sheetPeekHeight = with(density) {
-        (containerHeightPx * (1f - sheetCoversFraction)).toDp()
+        (containerHeightPx * sheetHeightFraction).toDp()
     }
 
     val sheetState = rememberStandardBottomSheetState(
@@ -124,7 +123,8 @@ fun HomeScreenContent(
         sheetDragHandle = null,
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetContent = {
-            PlannerSheetRedesign(
+            PlannerSheet(
+                sheetHeight = sheetPeekHeight,
                 dateDetails = dateDetails,
                 onFindCityState = onFindCityState,
                 onSetRadius = onSetRadius,
@@ -143,12 +143,12 @@ fun HomeScreenContent(
             )
         },
         containerColor = Color.Transparent
-    ) { innerPadding ->
+    ) {
         HomeMap(
             dateDetails = dateDetails,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(bottom = 200.dp),
             interactive = true
         )
     }

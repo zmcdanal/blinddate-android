@@ -1,12 +1,12 @@
 package com.ethereal.home.components.bottomSheet.slide_navigation
 
-enum class PlannerStep { Location, Radius, Details, Cuisine }
+enum class PlannerStep { Location, Radius, Cuisine, Details }
 
 val PlannerFlow = listOf(
     PlannerStep.Location,
     PlannerStep.Radius,
-    PlannerStep.Details,
-    PlannerStep.Cuisine
+    PlannerStep.Cuisine,
+    PlannerStep.Details
 )
 
 fun PlannerStep.index(): Int = PlannerFlow.indexOf(this)

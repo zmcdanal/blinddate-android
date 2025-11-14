@@ -2,10 +2,21 @@ package com.ethereal.home.components.bottomSheet
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,43 +24,43 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ethereal.design.reusables.DatePlanningSectionCard
 import com.ethereal.design.theme.BlindDateTheme
 import com.ethereal.design.theme.NeonRose
 import com.ethereal.model.data.CuisineOption
 
 @Composable
 fun CuisineSheet(
-    title: String = "Cuisine / Region",
+    title: String = "Cuisine & Vibe",
     options: List<CuisineOption>,
     selectedIds: Set<String>,
     onToggle: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth()
+    DatePlanningSectionCard(
+        title = title,
+        subtitle = "Pick one or more cuisines you’re in the mood for. We’ll keep the mystery.",
+        modifier = modifier
     ) {
-
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp, top = 4.dp)
-        )
-
-        Box(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    12.dp,
+                    Alignment.CenterHorizontally
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                maxItemsInEachRow = 3,
-                modifier = Modifier.fillMaxWidth()
+                maxItemsInEachRow = 3
             ) {
-                options.forEach { opt ->
+                options.forEach { option ->
                     CuisineCard(
-                        option = opt,
-                        selected = opt.id in selectedIds,
-                        onClick = { onToggle(opt.id) }
+                        option = option,
+                        selected = option.id in selectedIds,
+                        onClick = { onToggle(option.id) }
                     )
                 }
             }
@@ -64,7 +75,7 @@ private fun CuisineCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(14.dp)
+    val shape = RoundedCornerShape(18.dp)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,21 +88,32 @@ private fun CuisineCard(
                 color = if (selected) NeonRose else MaterialTheme.colorScheme.outlineVariant
             ),
             colors = CardDefaults.cardColors(
-                containerColor = if (selected)
-                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.25f)
-                else
-                    MaterialTheme.colorScheme.surfaceContainerHighest
+                containerColor = if (selected) {
+                    NeonRose.copy(alpha = 0.14f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+                }
             ),
             modifier = Modifier
-                .size(96.dp, 80.dp)
-                .clickable(role = Role.Checkbox, onClick = onClick)
+                .size(width = 96.dp, height = 82.dp)
+                .clickable(
+                    role = Role.Checkbox,
+                    onClick = onClick
+                )
         ) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(option.emoji, style = MaterialTheme.typography.headlineSmall)
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = option.emoji,
+                    style = MaterialTheme.typography.headlineSmall
+                )
             }
         }
 
         Spacer(Modifier.height(6.dp))
+
         Text(
             text = option.label,
             style = MaterialTheme.typography.labelMedium,
@@ -104,7 +126,6 @@ private fun CuisineCard(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewCuisineSheet() {
-
     val tempTestOptions = listOf(
         CuisineOption("american", "American", "🍔"),
         CuisineOption("mexican", "Mexican", "🌮"),
@@ -117,10 +138,11 @@ private fun PreviewCuisineSheet() {
         CuisineOption("med", "Mediterranean", "🥙"),
         CuisineOption("vegan", "Vegan", "🥗"),
     )
+
     BlindDateTheme {
         CuisineSheet(
             options = tempTestOptions,
-            selectedIds = setOf(""),
+            selectedIds = setOf("mexican", "thai"),
             onToggle = {}
         )
     }

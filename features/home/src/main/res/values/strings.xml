@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="search_radius">Search radius</string>
+    <string name="start_from_your_current_spot_or_pick_a_city_and_state">Start from your current spot or pick a city and state.</string>
+    <string name="location">Location</string>
+    <string name="use_my_location">Use my location</string>
+    <string name="we_ll_only_use_this_to_find_restaurants_nearby">We’ll only use this to find restaurants nearby.</string>
+    <string name="or">or</string>
 </resources>
