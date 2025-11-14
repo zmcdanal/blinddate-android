@@ -26,17 +26,13 @@ fun PlannerSheet(
     dateDetails: DateDetails,
     onFindCityState: (String) -> Unit,
     onSetRadius: (Int) -> Unit,
-    selectedCuisine: Set<String>,
     onToggleCuisine: (String) -> Unit,
     recenterOnUser: () -> Unit,
     currentStep: PlannerStep,
     onNext: () -> Unit,
     onBack: () -> Unit,
-    priceLevel: Int,
     onPriceLevelChange: (Int) -> Unit,
-    guests: Int,
     onGuestsChange: (Int) -> Unit,
-    minRating: Int,
     onMinRatingChange: (Int) -> Unit
 ) {
     val tempTestOptions = listOf(
@@ -48,7 +44,7 @@ fun PlannerSheet(
         CuisineOption("thai", "Thai", "🥟"),
         CuisineOption("indian", "Indian", "🍛"),
         CuisineOption("bbq", "BBQ", "🥩"),
-        CuisineOption("med", "Mediterranean", "🥙"),
+        CuisineOption("mediterranean", "Mediterranean", "🥙"),
         CuisineOption("vegan", "Vegan", "🥗"),
     )
 
@@ -122,7 +118,7 @@ fun PlannerSheet(
                     ) {
                         CuisineSheet(
                             options = tempTestOptions,
-                            selectedIds = selectedCuisine,
+                            selectedIds = dateDetails.cuisineIds,
                             onToggle = onToggleCuisine
                         )
                     }
@@ -137,11 +133,11 @@ fun PlannerSheet(
                         onNext = onNext
                     ) {
                         DetailsSheet(
-                            priceLevel = priceLevel,
+                            priceLevel = dateDetails.priceLevel,
                             onPriceLevelChange = onPriceLevelChange,
-                            guests = guests,
+                            guests = dateDetails.guests,
                             onGuestsChange = onGuestsChange,
-                            minRating = minRating,
+                            minRating = dateDetails.minRating,
                             onMinRatingChange = onMinRatingChange,
                         )
                     }
@@ -260,17 +256,13 @@ private fun PreviewPlannerSheetContent() {
             dateDetails = DateDetails(mapData = MapData(userLocation = null, radiusMiles = 5)),
             onFindCityState = {},
             onSetRadius = {},
-            selectedCuisine = setOf("american", "indian"),
             onToggleCuisine = {},
             currentStep = PlannerStep.Details,
             onNext = {},
             onBack = {},
             recenterOnUser = {},
-            priceLevel = 3,
             onPriceLevelChange = {},
-            guests = 2,
             onGuestsChange = {},
-            minRating = 2,
             onMinRatingChange = {}
         )
     }

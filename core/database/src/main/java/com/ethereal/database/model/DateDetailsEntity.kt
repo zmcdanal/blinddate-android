@@ -3,7 +3,7 @@ package com.ethereal.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ethereal.database.utils.csvToList
+import com.ethereal.database.utils.csvToSet
 import com.ethereal.database.utils.toCsv
 import com.ethereal.model.data.DateDetails
 import com.ethereal.model.data.MapData
@@ -20,11 +20,8 @@ data class DateDetailsEntity(
     @ColumnInfo(name = "date")
     val date: String,
 
-    @ColumnInfo(name = "cuisine")
-    val cuisine: String,
-
-    @ColumnInfo(name = "keywords")
-    val keywordsCsv: String,
+    @ColumnInfo(name = "cuisines")
+    val cuisineCsv: String,
 
     @ColumnInfo(name = "priceLevel")
     val priceLevel: Int,
@@ -35,8 +32,7 @@ data class DateDetailsEntity(
 
 fun DateDetailsEntity.asExternalModel() = DateDetails(
     date = date,
-    cuisine = cuisine,
-    keywords = keywordsCsv.csvToList(),
+    cuisineIds = cuisineCsv.csvToSet(),
     priceLevel = priceLevel,
     fastFood = fastFood,
     mapData = MapData(
@@ -49,8 +45,7 @@ fun DateDetails.toEntity(): DateDetailsEntity =
     DateDetailsEntity(
         id = 0,
         date = date,
-        cuisine = cuisine,
-        keywordsCsv = keywords.toCsv(),
+        cuisineCsv = cuisineIds.toCsv(),
         priceLevel = priceLevel,
         fastFood = fastFood
     )

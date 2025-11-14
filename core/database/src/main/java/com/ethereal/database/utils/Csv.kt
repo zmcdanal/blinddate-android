@@ -1,5 +1,16 @@
 package com.ethereal.database.utils
 
-internal fun List<String>.toCsv(): String = joinToString("|")
-internal fun String.csvToList(): List<String> =
-    if (isBlank()) emptyList() else split('|').map { it.trim() }.filter { it.isNotEmpty() }
+internal fun Set<String>.toCsv(): String =
+    this
+        .filter { it.isNotBlank() }
+        .joinToString(separator = "|")
+
+internal fun String.csvToSet(): Set<String> =
+    if (isBlank()) {
+        emptySet()
+    } else {
+        this.split('|')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .toSet()
+    }

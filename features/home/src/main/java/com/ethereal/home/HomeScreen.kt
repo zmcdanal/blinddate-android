@@ -44,7 +44,8 @@ fun HomeRoute(
         onBack = { viewModel.dispatch(PlannerIntent.Back) },
         setPriceLevel = viewModel::setPriceLevel,
         setGuests = viewModel::setGuests,
-        setMinRating = viewModel::setMinRating
+        setMinRating = viewModel::setMinRating,
+        onToggleCuisine = viewModel::toggleCuisine
     )
 }
 
@@ -59,7 +60,8 @@ fun HomeScreen(
     onBack: () -> Unit,
     setPriceLevel: (Int) -> Unit,
     setGuests: (Int) -> Unit,
-    setMinRating: (Int) -> Unit
+    setMinRating: (Int) -> Unit,
+    onToggleCuisine: (String) -> Unit
 ) {
     when (homeScreenUiState) {
         is HomeScreenUiState.Ready -> {
@@ -74,7 +76,8 @@ fun HomeScreen(
                 onBack = onBack,
                 setPriceLevel = setPriceLevel,
                 setGuests = setGuests,
-                setMinRating = setMinRating
+                setMinRating = setMinRating,
+                onToggleCuisine = onToggleCuisine
             )
         }
 
@@ -99,7 +102,8 @@ fun HomeScreenContent(
     onBack: () -> Unit,
     setPriceLevel: (Int) -> Unit,
     setGuests: (Int) -> Unit,
-    setMinRating: (Int) -> Unit
+    setMinRating: (Int) -> Unit,
+    onToggleCuisine: (String) -> Unit
 ) {
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -128,17 +132,13 @@ fun HomeScreenContent(
                 dateDetails = dateDetails,
                 onFindCityState = onFindCityState,
                 onSetRadius = onSetRadius,
-                selectedCuisine = emptySet(),
-                onToggleCuisine = {},
+                onToggleCuisine = onToggleCuisine,
                 recenterOnUser = recenterOnUser,
                 currentStep = currentStep,
                 onNext = onNext,
                 onBack = onBack,
-                priceLevel = dateDetails.priceLevel,
                 onPriceLevelChange = setPriceLevel,
-                guests = dateDetails.guests,
                 onGuestsChange = setGuests,
-                minRating = dateDetails.minRating,
                 onMinRatingChange = setMinRating
             )
         },

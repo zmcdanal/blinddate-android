@@ -99,10 +99,18 @@ class HomeViewModel @Inject constructor(
 
     }
 
+    fun saveDate() {
+        val details = (homeScreenUiState.value as? HomeScreenUiState.Ready)?.dateDetails
+            ?: return
+
+        startDate(details)
+    }
+
+
     fun startDate(dateDetails: DateDetails) = try {
         viewModelScope.launch {
             async {
-                dateDetailsRepository.save(dateDetails)
+                dateDetailsRepository.save(details = dateDetails)
             }.await()
         }
     } catch (exception: Exception) {
@@ -119,6 +127,19 @@ class HomeViewModel @Inject constructor(
     fun setRadius(value: Int) {
         radiusInput.tryEmit(value)
     }
+
+    fun toggleCuisine(cuisineId: String) = updateDetails { details ->
+        val current = details.cuisineIds
+        val updated = if (cuisineId in current) {
+            // remove if already selected
+            current - cuisineId
+        } else {
+            // add if not selected
+            current + cuisineId
+        }
+        details.copy(cuisineIds = updated)
+    }
+
 
     fun setPriceLevel(value: Int) = updateDetails {
         it.copy(priceLevel = value.coerceIn(1, 4))
@@ -201,9 +222,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun canBack(): Boolean = plannerNav.step != PlannerFlow.first()
-    fun canNext(): Boolean = validate(plannerNav.step)
-
     fun dispatch(intent: PlannerIntent) {
         when (intent) {
             PlannerIntent.Back -> {
@@ -213,6 +231,12 @@ class HomeViewModel @Inject constructor(
 
             PlannerIntent.Next -> {
                 if (!validate(plannerNav.step)) return
+
+                if (plannerNav.step == PlannerStep.Details) {
+                    saveDate()
+                    return
+                }
+
                 val next = plannerNav.step.nextOrSelf()
                 plannerNav = plannerNav.copy(step = next, direction = NavDir.Forward)
             }
@@ -225,14 +249,13 @@ class HomeViewModel @Inject constructor(
                     to < from -> NavDir.Backward
                     else -> NavDir.None
                 }
-                // require validation to move forward to later steps
                 if (to > from && !validate(plannerNav.step)) return
                 plannerNav = plannerNav.copy(step = intent.step, direction = dir)
             }
         }
     }
 
-    // ---- Validation per step (read from your Ready(uiState).dateDetails)
+
     private fun validate(step: PlannerStep): Boolean {
         val details = (homeScreenUiState.value as? HomeScreenUiState.Ready)?.dateDetails
             ?: return false

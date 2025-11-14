@@ -3,7 +3,7 @@ package com.ethereal.model.data
 data class DateDetails(
     val date: String = "",
     val cuisine: String = "",
-    val keywords: List<String> = emptyList(),
+    val cuisineIds: Set<String> = emptySet(),
     val priceLevel: Int = 2,
     val minRating: Int = 2,
     val guests: Int = 2,
