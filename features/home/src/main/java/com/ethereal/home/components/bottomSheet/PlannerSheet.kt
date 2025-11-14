@@ -33,7 +33,8 @@ fun PlannerSheet(
     onBack: () -> Unit,
     onPriceLevelChange: (Int) -> Unit,
     onGuestsChange: (Int) -> Unit,
-    onMinRatingChange: (Int) -> Unit
+    onMinRatingChange: (Int) -> Unit,
+    onCollapseClick: () -> Unit,
 ) {
     val tempTestOptions = listOf(
         CuisineOption("american", "American", "🍔"),
@@ -51,7 +52,7 @@ fun PlannerSheet(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(sheetHeight)
+            .heightIn(min = sheetHeight)
     ) {
         AnimatedContent(
             targetState = currentStep,
@@ -263,7 +264,8 @@ private fun PreviewPlannerSheetContent() {
             recenterOnUser = {},
             onPriceLevelChange = {},
             onGuestsChange = {},
-            onMinRatingChange = {}
+            onMinRatingChange = {},
+            onCollapseClick = {}
         )
     }
 }

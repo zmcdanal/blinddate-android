@@ -13,7 +13,6 @@ import com.ethereal.common.asResult
 import com.ethereal.data.repository.CityGeocodingRepository
 import com.ethereal.data.repository.DateDetailsRepository
 import com.ethereal.data.repository.UserDataRepository
-import com.ethereal.home.components.bottomSheet.slide_navigation.PlannerFlow
 import com.ethereal.home.components.bottomSheet.slide_navigation.PlannerStep
 import com.ethereal.home.components.bottomSheet.slide_navigation.index
 import com.ethereal.home.components.bottomSheet.slide_navigation.nextOrSelf
@@ -103,6 +102,7 @@ class HomeViewModel @Inject constructor(
         val details = (homeScreenUiState.value as? HomeScreenUiState.Ready)?.dateDetails
             ?: return
 
+        openCloseScaffold()
         startDate(details)
     }
 
@@ -115,6 +115,17 @@ class HomeViewModel @Inject constructor(
         }
     } catch (exception: Exception) {
         Log.d(TAG, "Unable to start date: ", exception)
+    }
+
+    fun openCloseScaffold() = try {
+        _homeScreenUiState.update { state ->
+            val readyState = state as? HomeScreenUiState.Ready ?: return@update state
+            state.copy(
+                isBottomSheetVisible = !readyState.isBottomSheetVisible
+            )
+        }
+    } catch (exception: Exception) {
+        Log.d(TAG, "Unable to open/close scaffold: ", exception)
     }
 
     private inline fun updateDetails(dateDetailsCopy: (DateDetails) -> DateDetails) {
@@ -310,7 +321,10 @@ class HomeViewModel @Inject constructor(
                         val dateDetails = currentDateDetails ?: DateDetails(
                             mapData = mapData
                         )
-                        HomeScreenUiState.Ready(dateDetails)
+                        HomeScreenUiState.Ready(
+                            dateDetails = dateDetails,
+                            isBottomSheetVisible = false
+                        )
                     }
                 }
             }
@@ -321,6 +335,7 @@ sealed interface HomeScreenUiState {
     data object Loading : HomeScreenUiState
     data class Ready(
         val dateDetails: DateDetails,
+        val isBottomSheetVisible: Boolean = true
     ) : HomeScreenUiState
 
     data class Error(val message: String) : HomeScreenUiState

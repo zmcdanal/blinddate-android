@@ -2,6 +2,7 @@ package com.ethereal.home
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -9,7 +10,9 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -26,6 +29,7 @@ import com.ethereal.model.data.DateDetails
 
 
 import com.ethereal.ui.BlindDateBackground
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeRoute(
@@ -65,9 +69,8 @@ fun HomeScreen(
 ) {
     when (homeScreenUiState) {
         is HomeScreenUiState.Ready -> {
-            val details = homeScreenUiState.dateDetails
             HomeScreenContent(
-                dateDetails = details,
+                dateDetails = homeScreenUiState.dateDetails,
                 currentStep = nav.step,
                 onFindCityState = onFindCityState,
                 onSetRadius = onSetRadius,
@@ -77,7 +80,8 @@ fun HomeScreen(
                 setPriceLevel = setPriceLevel,
                 setGuests = setGuests,
                 setMinRating = setMinRating,
-                onToggleCuisine = onToggleCuisine
+                onToggleCuisine = onToggleCuisine,
+                isBottomSheetVisible = homeScreenUiState.isBottomSheetVisible
             )
         }
 
@@ -103,7 +107,8 @@ fun HomeScreenContent(
     setPriceLevel: (Int) -> Unit,
     setGuests: (Int) -> Unit,
     setMinRating: (Int) -> Unit,
-    onToggleCuisine: (String) -> Unit
+    onToggleCuisine: (String) -> Unit,
+    isBottomSheetVisible: Boolean
 ) {
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -116,15 +121,26 @@ fun HomeScreenContent(
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
-        skipHiddenState = true
+        skipHiddenState = false
     )
     val scaffoldState = rememberBottomSheetScaffoldState(sheetState)
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(isBottomSheetVisible) {
+        if (isBottomSheetVisible) {
+            sheetState.expand()
+        } else {
+            sheetState.hide()
+        }
+    }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = sheetPeekHeight,
-        sheetSwipeEnabled = false,
-        sheetDragHandle = null,
+        sheetSwipeEnabled = true,
+        sheetDragHandle = {
+            BottomSheetDefaults.DragHandle()
+        },
         sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetContent = {
             PlannerSheet(
@@ -139,16 +155,19 @@ fun HomeScreenContent(
                 onBack = onBack,
                 onPriceLevelChange = setPriceLevel,
                 onGuestsChange = setGuests,
-                onMinRatingChange = setMinRating
+                onMinRatingChange = setMinRating,
+                onCollapseClick = {
+                    scope.launch {
+                        sheetState.hide()
+                    }
+                }
             )
         },
         containerColor = Color.Transparent
     ) {
         HomeMap(
             dateDetails = dateDetails,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 200.dp),
+            modifier = Modifier.fillMaxSize(),
             interactive = true
         )
     }
