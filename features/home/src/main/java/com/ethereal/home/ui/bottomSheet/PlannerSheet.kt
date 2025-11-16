@@ -25,6 +25,7 @@ fun PlannerSheet(
     sheetHeight: Dp,
     dateDetails: DateDetails,
     onFindCityState: (String) -> Unit,
+    onPickLocationOnMap: () -> Unit,
     onSetRadius: (Int) -> Unit,
     onToggleCuisine: (String) -> Unit,
     recenterOnUser: () -> Unit,
@@ -84,9 +85,7 @@ fun PlannerSheet(
                             cityState = dateDetails.mapData.cityState,
                             onFindCityState = onFindCityState,
                             recenterOnUser = recenterOnUser,
-                            onPickOnMap = {
-                                onCollapseClick()
-                            }
+                            onPickLocationOnMap = onPickLocationOnMap
                         )
                     }
                 }
@@ -275,6 +274,7 @@ private fun PreviewPlannerSheetContent() {
             onMinRatingChange = {},
             onCollapseClick = {},
             onFastFoodAllowedChange = {},
+            onPickLocationOnMap = {},
         )
     }
 }

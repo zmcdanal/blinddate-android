@@ -21,6 +21,7 @@ import com.ethereal.home.location.LocationClient
 import com.ethereal.model.data.DateDetails
 import com.ethereal.model.data.GeoPoint
 import com.ethereal.model.data.MapData
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -132,6 +133,34 @@ class HomeViewModel @Inject constructor(
         _homeScreenUiState.update { state ->
             if (state is HomeScreenUiState.Ready) state.copy(dateDetails = dateDetailsCopy(state.dateDetails))
             else state
+        }
+    }
+
+    fun setAllowUserToChooseCenter() {
+        _homeScreenUiState.update { state ->
+            if (state is HomeScreenUiState.Ready) {
+                state.copy(
+                    allowTapToChooseCenter = true
+                )
+            } else state
+        }
+    }
+    fun setCenterViaMapTap(latLng: LatLng) {
+        val geoPoint = GeoPoint(latLng.latitude, latLng.longitude)
+        _homeScreenUiState.update { state ->
+            if (state is HomeScreenUiState.Ready) {
+                val details = state.dateDetails
+                val oldMap = details.mapData
+                state.copy(
+                    allowTapToChooseCenter = false,
+                dateDetails = details.copy(
+                    mapData = oldMap.copy(
+                        userLocation = geoPoint,
+                        cityState = ""
+                    )
+                )
+                )
+            } else state
         }
     }
 
@@ -333,6 +362,7 @@ sealed interface HomeScreenUiState {
     data class Ready(
         val dateDetails: DateDetails,
         val mapLoading: Boolean = true,
+        val allowTapToChooseCenter: Boolean = false,
         val isBottomSheetVisible: Boolean = false
     ) : HomeScreenUiState
 

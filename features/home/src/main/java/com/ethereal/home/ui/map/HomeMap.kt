@@ -33,7 +33,6 @@ fun HomeMap(
     isMapLoading: Boolean,
     modifier: Modifier = Modifier,
     interactive: Boolean = true,
-    // only let taps change center when sheet is hidden
     allowTapToChooseCenter: Boolean = false,
     onCenterChanged: (LatLng) -> Unit = {}
 ) {

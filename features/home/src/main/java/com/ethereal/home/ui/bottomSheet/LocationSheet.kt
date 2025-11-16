@@ -60,7 +60,7 @@ fun LocationSheet(
     cityState: String,
     onFindCityState: (String) -> Unit,
     recenterOnUser: () -> Unit,
-    onPickOnMap: () -> Unit = {},
+    onPickLocationOnMap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isReady = dateDetails.mapData.userLocation != null
@@ -213,7 +213,7 @@ fun LocationSheet(
                 LocationMode.MAP -> {
                     // === DROP A PIN / PICK ON MAP ===
                     OutlinedButton(
-                        onClick = onPickOnMap,
+                        onClick = onPickLocationOnMap,
                         shape = RoundedCornerShape(999.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = NeonRose,
@@ -281,7 +281,7 @@ private fun PreviewLocationSheet() {
             cityState = "Birmingham, AL",
             onFindCityState = {},
             recenterOnUser = {},
-            onPickOnMap = {}
+            onPickLocationOnMap = {}
         )
     }
 }

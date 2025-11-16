@@ -1,16 +1,7 @@
 package com.ethereal.home
 
-import android.os.SystemClock
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
@@ -21,34 +12,18 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,9 +35,8 @@ import com.ethereal.model.data.DateDetails
 
 
 import com.ethereal.ui.BlindDateBackground
-import dagger.hilt.android.UnstableApi
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @Composable
 fun HomeRoute(
@@ -83,7 +57,9 @@ fun HomeRoute(
         setGuests = viewModel::setGuests,
         setMinRating = viewModel::setMinRating,
         onFastFoodAllowedChange = viewModel::setFastFoodAllowed,
-        onToggleCuisine = viewModel::toggleCuisine
+        onToggleCuisine = viewModel::toggleCuisine,
+        setCenterViaMapTap = viewModel::setCenterViaMapTap,
+        onPickLocationOnMap = viewModel::setAllowUserToChooseCenter
     )
 }
 
@@ -92,6 +68,8 @@ fun HomeScreen(
     homeScreenUiState: HomeScreenUiState,
     nav: PlannerNavState,
     onFindCityState: (String) -> Unit,
+    setCenterViaMapTap: (LatLng) -> Unit,
+    onPickLocationOnMap: () -> Unit,
     onSetRadius: (Int) -> Unit,
     recenterOnUser: () -> Unit,
     onNext: () -> Unit,
@@ -109,6 +87,7 @@ fun HomeScreen(
                 isMapLoading = homeScreenUiState.mapLoading,
                 currentStep = nav.step,
                 onFindCityState = onFindCityState,
+                onPickLocationOnMap = onPickLocationOnMap,
                 onSetRadius = onSetRadius,
                 recenterOnUser = recenterOnUser,
                 onNext = onNext,
@@ -118,7 +97,9 @@ fun HomeScreen(
                 setMinRating = setMinRating,
                 onToggleCuisine = onToggleCuisine,
                 onFastFoodAllowedChange = onFastFoodAllowedChange,
-                isBottomSheetVisible = homeScreenUiState.isBottomSheetVisible
+                isBottomSheetVisible = homeScreenUiState.isBottomSheetVisible,
+                allowTapToChooseCenter = homeScreenUiState.allowTapToChooseCenter,
+                onCenterChanged = setCenterViaMapTap,
             )
         }
 
@@ -137,6 +118,7 @@ fun HomeScreenContent(
     isMapLoading: Boolean,
     currentStep: PlannerStep,
     onFindCityState: (String) -> Unit,
+    onPickLocationOnMap: () -> Unit,
     onSetRadius: (Int) -> Unit,
     recenterOnUser: () -> Unit,
     onNext: () -> Unit,
@@ -146,7 +128,9 @@ fun HomeScreenContent(
     setMinRating: (Int) -> Unit,
     onToggleCuisine: (String) -> Unit,
     onFastFoodAllowedChange: (Boolean) -> Unit,
-    isBottomSheetVisible: Boolean
+    isBottomSheetVisible: Boolean,
+    allowTapToChooseCenter: Boolean,
+    onCenterChanged: (LatLng) -> Unit
 ) {
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -173,6 +157,14 @@ fun HomeScreenContent(
          }
      }
 
+    LaunchedEffect(allowTapToChooseCenter) {
+        if (allowTapToChooseCenter) {
+            sheetState.hide()
+        } else {
+            sheetState.partialExpand()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
@@ -197,7 +189,8 @@ fun HomeScreenContent(
                     onFastFoodAllowedChange = onFastFoodAllowedChange,
                     onCollapseClick = {
                         scope.launch { sheetState.hide() }
-                    }
+                    },
+                    onPickLocationOnMap = onPickLocationOnMap
                 )
             },
             containerColor = Color.Transparent,
@@ -207,7 +200,8 @@ fun HomeScreenContent(
                 dateDetails = dateDetails,
                 isMapLoading = isMapLoading,
                 modifier = Modifier.fillMaxSize(),
-                interactive = true
+                onCenterChanged = onCenterChanged,
+                allowTapToChooseCenter = allowTapToChooseCenter
             )
         }
 
