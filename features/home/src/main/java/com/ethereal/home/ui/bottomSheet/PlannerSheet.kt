@@ -1,4 +1,4 @@
-package com.ethereal.home.components.bottomSheet
+package com.ethereal.home.ui.bottomSheet
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.slideInHorizontally
@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ethereal.design.theme.BlindDateTheme
-import com.ethereal.home.components.bottomSheet.slide_navigation.PlannerStep
+import com.ethereal.home.ui.bottomSheet.slide_navigation.PlannerStep
 import com.ethereal.model.data.CuisineOption
 import com.ethereal.model.data.DateDetails
 import com.ethereal.model.data.MapData
@@ -34,6 +34,7 @@ fun PlannerSheet(
     onPriceLevelChange: (Int) -> Unit,
     onGuestsChange: (Int) -> Unit,
     onMinRatingChange: (Int) -> Unit,
+    onFastFoodAllowedChange: (Boolean) -> Unit,
     onCollapseClick: () -> Unit,
 ) {
     val tempTestOptions = listOf(
@@ -52,9 +53,9 @@ fun PlannerSheet(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = sheetHeight)
+            .height(sheetHeight)
     ) {
-        AnimatedContent(
+    AnimatedContent(
             targetState = currentStep,
             transitionSpec = {
                 if (targetState.ordinal > initialState.ordinal) {
@@ -83,6 +84,9 @@ fun PlannerSheet(
                             cityState = dateDetails.mapData.cityState,
                             onFindCityState = onFindCityState,
                             recenterOnUser = recenterOnUser,
+                            onPickOnMap = {
+                                onCollapseClick()
+                            }
                         )
                     }
                 }
@@ -120,7 +124,9 @@ fun PlannerSheet(
                         CuisineSheet(
                             options = tempTestOptions,
                             selectedIds = dateDetails.cuisineIds,
-                            onToggle = onToggleCuisine
+                            onToggle = onToggleCuisine,
+                            fastFoodAllowed = dateDetails.fastFood,
+                            onFastFoodAllowedChange = onFastFoodAllowedChange
                         )
                     }
                 }
@@ -199,6 +205,8 @@ private fun PlannerStepScaffold(
             onBack = onBack,
             onNext = onNext
         )
+
+        Spacer(modifier = Modifier.height(25.dp))
     }
 }
 
@@ -265,7 +273,8 @@ private fun PreviewPlannerSheetContent() {
             onPriceLevelChange = {},
             onGuestsChange = {},
             onMinRatingChange = {},
-            onCollapseClick = {}
+            onCollapseClick = {},
+            onFastFoodAllowedChange = {},
         )
     }
 }

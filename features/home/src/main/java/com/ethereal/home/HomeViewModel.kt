@@ -13,10 +13,10 @@ import com.ethereal.common.asResult
 import com.ethereal.data.repository.CityGeocodingRepository
 import com.ethereal.data.repository.DateDetailsRepository
 import com.ethereal.data.repository.UserDataRepository
-import com.ethereal.home.components.bottomSheet.slide_navigation.PlannerStep
-import com.ethereal.home.components.bottomSheet.slide_navigation.index
-import com.ethereal.home.components.bottomSheet.slide_navigation.nextOrSelf
-import com.ethereal.home.components.bottomSheet.slide_navigation.prevOrSelf
+import com.ethereal.home.ui.bottomSheet.slide_navigation.PlannerStep
+import com.ethereal.home.ui.bottomSheet.slide_navigation.index
+import com.ethereal.home.ui.bottomSheet.slide_navigation.nextOrSelf
+import com.ethereal.home.ui.bottomSheet.slide_navigation.prevOrSelf
 import com.ethereal.home.location.LocationClient
 import com.ethereal.model.data.DateDetails
 import com.ethereal.model.data.GeoPoint
@@ -152,30 +152,26 @@ class HomeViewModel @Inject constructor(
     }
 
 
-    fun setPriceLevel(value: Int) = updateDetails {
-        it.copy(priceLevel = value.coerceIn(1, 4))
+    fun setPriceLevel(priceLevel: Int) = updateDetails {
+        it.copy(priceLevel = priceLevel.coerceIn(1, 4))
     }
 
-    fun setGuests(value: Int) = updateDetails {
-        it.copy(guests = value.coerceAtLeast(1))
+    fun setGuests(guestCount: Int) = updateDetails {
+        it.copy(guests = guestCount.coerceAtLeast(1))
     }
 
-    fun setMinRating(value: Int) = updateDetails {
-        it.copy(minRating = value.coerceIn(1, 5))
+    fun setMinRating(rating: Int) = updateDetails {
+        it.copy(minRating = rating.coerceIn(1, 5))
+    }
+
+    fun setFastFoodAllowed(isAllowed: Boolean) = updateDetails {
+        it.copy(fastFood = isAllowed)
     }
 
     fun toggleLoading() {
         _homeScreenUiState.update { state ->
             if (state is HomeScreenUiState.Ready) {
-                val old = state.dateDetails
-                val oldMap = old.mapData
-                state.copy(
-                    dateDetails = old.copy(
-                        mapData = oldMap.copy(
-                            mapLoading = !oldMap.mapLoading
-                        )
-                    )
-                )
+                state.copy(mapLoading = !state.mapLoading)
             } else state
         }
     }
@@ -191,9 +187,9 @@ class HomeViewModel @Inject constructor(
                         val old = state.dateDetails
                         val oldMap = old.mapData
                         state.copy(
+                            mapLoading = false,
                             dateDetails = old.copy(
                                 mapData = oldMap.copy(
-                                    mapLoading = false,
                                     userLocation = geoPoint,
                                     cityState = cityState
                                 )
@@ -217,9 +213,9 @@ class HomeViewModel @Inject constructor(
                         val old = state.dateDetails
                         val oldMap = old.mapData
                         state.copy(
+                            mapLoading = false,
                             dateDetails = old.copy(
                                 mapData = oldMap.copy(
-                                    mapLoading = false,
                                     userLocation = geo,
                                     cityState = ""
                                 )
@@ -314,16 +310,17 @@ class HomeViewModel @Inject constructor(
                     is Result.Success -> {
                         val (userData, currentDateDetails, userLocation) = homeResult.data
                         val mapData = MapData(
-                            mapLoading = false,
                             userLocation = userLocation,
                             radiusMiles = userData.defaultRadius
                         )
-                        val dateDetails = currentDateDetails ?: DateDetails(
+                        val dateDetails = currentDateDetails?.copy(mapData = mapData) ?: DateDetails(
                             mapData = mapData
                         )
+
                         HomeScreenUiState.Ready(
                             dateDetails = dateDetails,
-                            isBottomSheetVisible = false
+                            mapLoading = false,
+                            isBottomSheetVisible = true
                         )
                     }
                 }
@@ -335,7 +332,8 @@ sealed interface HomeScreenUiState {
     data object Loading : HomeScreenUiState
     data class Ready(
         val dateDetails: DateDetails,
-        val isBottomSheetVisible: Boolean = true
+        val mapLoading: Boolean = true,
+        val isBottomSheetVisible: Boolean = false
     ) : HomeScreenUiState
 
     data class Error(val message: String) : HomeScreenUiState

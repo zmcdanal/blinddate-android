@@ -12,7 +12,6 @@ data class DateDetails(
 )
 
 data class MapData(
-    val mapLoading: Boolean = true,
     val userLocation: GeoPoint?,
     val cityState: String = "",
     val radiusMiles: Int

@@ -1,4 +1,4 @@
-package com.ethereal.home.components.bottomSheet
+package com.ethereal.home.ui.bottomSheet
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement

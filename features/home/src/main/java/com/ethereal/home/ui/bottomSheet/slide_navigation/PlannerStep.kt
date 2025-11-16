@@ -1,4 +1,4 @@
-package com.ethereal.home.components.bottomSheet.slide_navigation
+package com.ethereal.home.ui.bottomSheet.slide_navigation
 
 enum class PlannerStep { Location, Radius, Cuisine, Details }
 
