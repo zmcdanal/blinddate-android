@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -149,19 +150,11 @@ fun HomeScreenContent(
     )
     val scaffoldState = rememberBottomSheetScaffoldState(sheetState)
 
-     LaunchedEffect(isBottomSheetVisible) {
-         if (isBottomSheetVisible) {
-             sheetState.partialExpand()
-         } else {
-             sheetState.hide()
-         }
-     }
-
-    LaunchedEffect(allowTapToChooseCenter) {
-        if (allowTapToChooseCenter) {
-            sheetState.hide()
-        } else {
+    LaunchedEffect(isBottomSheetVisible) {
+        if (isBottomSheetVisible) {
             sheetState.partialExpand()
+        } else {
+            sheetState.hide()
         }
     }
 

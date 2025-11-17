@@ -28,6 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -140,25 +141,8 @@ class HomeViewModel @Inject constructor(
         _homeScreenUiState.update { state ->
             if (state is HomeScreenUiState.Ready) {
                 state.copy(
-                    allowTapToChooseCenter = true
-                )
-            } else state
-        }
-    }
-    fun setCenterViaMapTap(latLng: LatLng) {
-        val geoPoint = GeoPoint(latLng.latitude, latLng.longitude)
-        _homeScreenUiState.update { state ->
-            if (state is HomeScreenUiState.Ready) {
-                val details = state.dateDetails
-                val oldMap = details.mapData
-                state.copy(
-                    allowTapToChooseCenter = false,
-                dateDetails = details.copy(
-                    mapData = oldMap.copy(
-                        userLocation = geoPoint,
-                        cityState = ""
-                    )
-                )
+                    allowTapToChooseCenter = true,
+                    isBottomSheetVisible = false
                 )
             } else state
         }
@@ -216,6 +200,7 @@ class HomeViewModel @Inject constructor(
                         val old = state.dateDetails
                         val oldMap = old.mapData
                         state.copy(
+                            isBottomSheetVisible = false,
                             mapLoading = false,
                             dateDetails = old.copy(
                                 mapData = oldMap.copy(
@@ -226,6 +211,7 @@ class HomeViewModel @Inject constructor(
                         )
                     } else state
                 }
+                showBottomSheetWithDelay()
             }
         } catch (exception: Exception) {
             Log.d(TAG, "Unable to find LatLng from City/State: ", exception)
@@ -235,28 +221,87 @@ class HomeViewModel @Inject constructor(
     fun centerRadiusOnUser() = viewModelScope.launch {
         try {
             toggleLoading()
-            val geo = locationClient.currentOnce(5_000L) ?: locationClient.lastKnownOnce()
-            if (geo != null) {
+
+            val geoPoint = locationClient.currentOnce(5_000L)
+                ?: locationClient.lastKnownOnce()
+
+            if (geoPoint != null) {
+                // Try to resolve a nearby "City, ST" label
+                val cityState = runCatching {
+                    cityGeocodingRepository.latLngToCityState(geoPoint)
+                }.getOrNull()
+
                 _homeScreenUiState.update { state ->
                     if (state is HomeScreenUiState.Ready) {
                         val old = state.dateDetails
                         val oldMap = old.mapData
                         state.copy(
-                            mapLoading = false,
+                            isBottomSheetVisible = false,
+                            // if you have a mapLoading flag, set it here as needed
                             dateDetails = old.copy(
                                 mapData = oldMap.copy(
-                                    userLocation = geo,
-                                    cityState = ""
+                                    userLocation = geoPoint,
+                                    // show nearest city if we found one, otherwise fall back
+                                    cityState = cityState ?: ""
                                 )
                             )
                         )
-                    } else state
+                    } else {
+                        state
+                    }
                 }
+                showBottomSheetWithDelay()
             }
         } catch (exception: Exception) {
             Log.d(TAG, "Unable to center on user: ", exception)
         }
     }
+
+
+    fun setCenterViaMapTap(latLng: LatLng) = viewModelScope.launch {
+        try {
+            toggleLoading()
+            val geoPoint = GeoPoint(latLng.latitude, latLng.longitude)
+
+            val cityState = runCatching {
+                cityGeocodingRepository.latLngToCityState(geoPoint)
+            }.getOrNull()
+
+            _homeScreenUiState.update { state ->
+                if (state is HomeScreenUiState.Ready) {
+                    val details = state.dateDetails
+                    val oldMap = details.mapData
+                    state.copy(
+                        mapLoading = false,
+                        isBottomSheetVisible = false,
+                        allowTapToChooseCenter = false,
+                        dateDetails = details.copy(
+                            mapData = oldMap.copy(
+                                userLocation = geoPoint,
+                                cityState = cityState ?: ""
+                            )
+                        )
+                    )
+                } else state
+            }
+            showBottomSheetWithDelay()
+        } catch (exception: Exception) {
+            Log.d(TAG, "Unable to center on map tap: ", exception)
+        }
+    }
+
+    fun showBottomSheetWithDelay(delayMillis: Long = 2_000L) = viewModelScope.launch {
+            delay(delayMillis)
+            _homeScreenUiState.update { state ->
+                if (state is HomeScreenUiState.Ready) {
+                    state.copy(isBottomSheetVisible = true)
+                } else {
+                    state
+                }
+            }
+        }
+
+
 
     fun dispatch(intent: PlannerIntent) {
         when (intent) {

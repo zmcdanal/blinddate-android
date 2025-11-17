@@ -40,6 +40,34 @@ class OfflineFirstCityGeocodingRepository @Inject constructor(
                 }
             }.getOrNull()
         }
+
+    override suspend fun latLngToCityState(point: GeoPoint): String? =
+        withContext(ioDispatcher) {
+            runCatching {
+                val geocoder = Geocoder(context, Locale.US)
+
+                val address: Address? =
+                    if (Build.VERSION.SDK_INT >= 33) {
+                        geocodeLocation33(geocoder, point.lat, point.lng)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        geocoder.getFromLocation(point.lat, point.lng, 1)?.firstOrNull()
+                    }
+
+                address?.let { addr ->
+                    // Try to get a friendly "City, ST"
+                    val city = addr.locality
+                        ?: addr.subAdminArea
+                    val state = addr.adminArea
+
+                    if (!city.isNullOrBlank() && !state.isNullOrBlank()) {
+                        "$city, $state"
+                    } else {
+                        null
+                    }
+                }
+            }.getOrNull()
+        }
 }
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -58,4 +86,26 @@ private suspend fun geocode33(
                 cont.resume(null)
             }
         })
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private suspend fun geocodeLocation33(
+    geocoder: Geocoder,
+    latitude: Double,
+    longitude: Double
+): Address? = suspendCancellableCoroutine { cont ->
+    geocoder.getFromLocation(
+        latitude,
+        longitude,
+        1,
+        object : Geocoder.GeocodeListener {
+            override fun onGeocode(results: MutableList<Address>) {
+                cont.resume(results.firstOrNull())
+            }
+
+            override fun onError(errorMessage: String?) {
+                cont.resume(null)
+            }
+        }
+    )
 }

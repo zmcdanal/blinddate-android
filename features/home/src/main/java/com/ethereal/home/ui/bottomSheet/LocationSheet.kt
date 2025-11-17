@@ -86,8 +86,14 @@ fun LocationSheet(
         )
     }
 
+    val locationString = if (dateDetails.mapData.cityState.isNotEmpty()) {
+        "Location: ${dateDetails.mapData.cityState}"
+    } else {
+        stringResource(R.string.location)
+    }
+
     DatePlanningSectionCard(
-        title = stringResource(R.string.location),
+        title = locationString,
         subtitle = stringResource(R.string.start_from_your_current_spot_or_pick_a_city_and_state),
         modifier = modifier
     ) {
