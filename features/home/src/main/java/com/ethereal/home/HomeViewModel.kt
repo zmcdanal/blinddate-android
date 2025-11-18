@@ -104,7 +104,7 @@ class HomeViewModel @Inject constructor(
         val details = (homeScreenUiState.value as? HomeScreenUiState.Ready)?.dateDetails
             ?: return
 
-        openCloseScaffold()
+        openCloseScaffold(true, isBottomSheetGone = true)
         startDate(details)
     }
 
@@ -119,11 +119,12 @@ class HomeViewModel @Inject constructor(
         Log.d(TAG, "Unable to start date: ", exception)
     }
 
-    fun openCloseScaffold() = try {
+    fun openCloseScaffold(close: Boolean, isBottomSheetGone: Boolean = false) = try {
         _homeScreenUiState.update { state ->
-            val readyState = state as? HomeScreenUiState.Ready ?: return@update state
+            if (state !is HomeScreenUiState.Ready) return@update state
             state.copy(
-                isBottomSheetVisible = !readyState.isBottomSheetVisible
+                isBottomSheetVisible = !close,
+                isBottomSheetGone = isBottomSheetGone
             )
         }
     } catch (exception: Exception) {
@@ -408,7 +409,8 @@ sealed interface HomeScreenUiState {
         val dateDetails: DateDetails,
         val mapLoading: Boolean = true,
         val allowTapToChooseCenter: Boolean = false,
-        val isBottomSheetVisible: Boolean = false
+        val isBottomSheetVisible: Boolean = false,
+        val isBottomSheetGone: Boolean = false,
     ) : HomeScreenUiState
 
     data class Error(val message: String) : HomeScreenUiState

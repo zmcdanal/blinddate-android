@@ -60,7 +60,8 @@ fun HomeRoute(
         onFastFoodAllowedChange = viewModel::setFastFoodAllowed,
         onToggleCuisine = viewModel::toggleCuisine,
         setCenterViaMapTap = viewModel::setCenterViaMapTap,
-        onPickLocationOnMap = viewModel::setAllowUserToChooseCenter
+        onPickLocationOnMap = viewModel::setAllowUserToChooseCenter,
+        toggleSheetState = viewModel::openCloseScaffold
     )
 }
 
@@ -79,6 +80,7 @@ fun HomeScreen(
     setGuests: (Int) -> Unit,
     setMinRating: (Int) -> Unit,
     onToggleCuisine: (String) -> Unit,
+    toggleSheetState: (close: Boolean) -> Unit,
     onFastFoodAllowedChange: (Boolean) -> Unit,
 ) {
     when (homeScreenUiState) {
@@ -86,6 +88,7 @@ fun HomeScreen(
             HomeScreenContent(
                 dateDetails = homeScreenUiState.dateDetails,
                 isMapLoading = homeScreenUiState.mapLoading,
+                isBottomSheetGone = homeScreenUiState.isBottomSheetGone,
                 currentStep = nav.step,
                 onFindCityState = onFindCityState,
                 onPickLocationOnMap = onPickLocationOnMap,
@@ -101,6 +104,7 @@ fun HomeScreen(
                 isBottomSheetVisible = homeScreenUiState.isBottomSheetVisible,
                 allowTapToChooseCenter = homeScreenUiState.allowTapToChooseCenter,
                 onCenterChanged = setCenterViaMapTap,
+                toggleSheetState = toggleSheetState,
             )
         }
 
@@ -117,6 +121,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     dateDetails: DateDetails,
     isMapLoading: Boolean,
+    isBottomSheetGone: Boolean,
     currentStep: PlannerStep,
     onFindCityState: (String) -> Unit,
     onPickLocationOnMap: () -> Unit,
@@ -129,6 +134,7 @@ fun HomeScreenContent(
     setMinRating: (Int) -> Unit,
     onToggleCuisine: (String) -> Unit,
     onFastFoodAllowedChange: (Boolean) -> Unit,
+    toggleSheetState: (close: Boolean) -> Unit,
     isBottomSheetVisible: Boolean,
     allowTapToChooseCenter: Boolean,
     onCenterChanged: (LatLng) -> Unit
@@ -198,10 +204,26 @@ fun HomeScreenContent(
             )
         }
 
-        // Arrow to reopen when sheet is hidden
-        if (sheetState.currentValue == SheetValue.Hidden && !isMapLoading) {
+        // Arrow to collapse when sheet is partially expanded
+        if (sheetState.currentValue == SheetValue.PartiallyExpanded && !isMapLoading && !isBottomSheetGone) {
             FilledTonalIconButton(
-                onClick = { scope.launch { sheetState.partialExpand() } },
+                onClick = { toggleSheetState(true) },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    // push it up to just above the top edge of the sheet
+                    .padding(bottom = sheetHeight + 16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ExpandMore,
+                    contentDescription = "Hide date planner"
+                )
+            }
+        }
+
+        // Arrow to reopen when sheet is hidden
+        if (sheetState.currentValue == SheetValue.Hidden && !isMapLoading && !isBottomSheetGone) {
+            FilledTonalIconButton(
+                onClick = { toggleSheetState(false) },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 24.dp)
@@ -214,6 +236,7 @@ fun HomeScreenContent(
         }
     }
 }
+
 
 
 
